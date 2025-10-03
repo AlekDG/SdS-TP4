@@ -33,6 +33,21 @@ public class DampedOscillator implements MovementModel {
     }
 
     @Override
+    public BiFunction<Double, Double, Double> getR3() {
+        return (r1, r2) -> forceFunction().apply(r1, r2) / mass;
+    }
+
+    @Override
+    public BiFunction<Double, Double, Double> getR4() {
+        return (r2, r3) -> forceFunction().apply(r2, r3) / mass;
+    }
+
+    @Override
+    public BiFunction<Double, Double, Double> getR5() {
+        return (r3, r4) -> forceFunction().apply(r3, r4) / mass;
+    }
+
+    @Override
     public double mass() {
         return mass;
     }
@@ -45,6 +60,11 @@ public class DampedOscillator implements MovementModel {
     @Override
     public double deltaT() {
         return deltaT;
+    }
+
+    @Override
+    public boolean isForceFunctionSpeedDependant() {
+        return true;
     }
 
     @Override
