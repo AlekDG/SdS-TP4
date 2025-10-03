@@ -50,7 +50,7 @@ public class EstimationMethod {
                     double speed = p.getPositionAndSpeedPair()[i].getSpeed();
                     double force = modelCopy.forceFunction().apply(pos, speed);
                     double prevPosAux = pos - deltaT * speed + deltaTPow2 * force / (2 * mass); // euler
-                    prevPos.get(p.getId()).add(i, prevPosAux);
+                    prevPos.get(p.getId()).add(prevPosAux);
                 }
             }
         }
@@ -112,7 +112,7 @@ public class EstimationMethod {
                     double prevPos = pos - deltaT * speed + force * deltaTPow2 / (2 * mass);
                     double prevSpeed = speed - deltaT * force / mass;
                     Particle.PosSpeedPair prevPosAndSpeedAux = new Particle.PosSpeedPair(prevPos, prevSpeed);
-                    prevPosAndSpeed.get(p.getId()).add(i, prevPosAndSpeedAux);
+                    prevPosAndSpeed.get(p.getId()).add(prevPosAndSpeedAux);
                 }
             }
         }

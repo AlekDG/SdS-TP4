@@ -2,8 +2,8 @@ package engine;
 
 public class Particle {
     public static final int DIMENSION = 3;
-    private static int globalId = 1;
-    private int id;
+    private static int globalId = 0;
+    private final int id;
     private double x, y, z;
     private double sx, sy, sz;
     private final double r;
