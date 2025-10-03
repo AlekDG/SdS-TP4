@@ -1,5 +1,8 @@
 package engine;
 
+import tools.PostProcessor;
+
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -72,26 +75,23 @@ public class DampedOscillator implements MovementModel {
         return new DampedOscillator(K, gamma, mass, deltaT, particle.hardCopy());
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70, Math.pow(10, -2));
         EstimationMethod estimationMethod = new EstimationMethod(model, 5);
         Iterator<Time> timeIt;
         timeIt = estimationMethod.verletEstimation();
-        while (timeIt.hasNext()) {
-            Time time = timeIt.next();
-            // Post Process
+        try (PostProcessor postProcessor = new PostProcessor("verlet.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
         }
 
         timeIt = estimationMethod.beemanEstimation();
-        while (timeIt.hasNext()) {
-            Time time = timeIt.next();
-            // Post Process
+        try (PostProcessor postProcessor = new PostProcessor("beeman.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
         }
 
         timeIt = estimationMethod.gearEstimation();
-        while (timeIt.hasNext()) {
-            Time time = timeIt.next();
-            // Post Process
+        try (PostProcessor postProcessor = new PostProcessor("gear.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
         }
     }
 }
