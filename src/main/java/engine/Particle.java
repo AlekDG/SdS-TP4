@@ -1,6 +1,7 @@
 package engine;
 
 public class Particle {
+    public static final int DIMENSION = 3;
     private static int globalId = 1;
     private final int id;
     private double x, y, z;
@@ -27,6 +28,13 @@ public class Particle {
 
     public double getSpeedZ() {
         return sz;
+    }
+
+    public PosSpeedPair[] getPositionAndSpeedPair() { return new PosSpeedPair[] {
+            new PosSpeedPair(x, sx),
+            new PosSpeedPair(y, sy),
+            new PosSpeedPair(z, sz)
+        };
     }
 
     public double getX() {
@@ -66,5 +74,22 @@ public class Particle {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Particle p && id == p.id;
+    }
+
+    public static class PosSpeedPair {
+        private final double pos;
+        private final double speed;
+        public PosSpeedPair(double pos, double speed) {
+            this.pos = pos;
+            this.speed = speed;
+        }
+
+        public double getPos() {
+            return pos;
+        }
+
+        public double getSpeed() {
+            return speed;
+        }
     }
 }
