@@ -3,13 +3,17 @@ package engine;
 public class Particle {
     public static final int DIMENSION = 3;
     private static int globalId = 1;
-    private final int id;
+    private int id;
     private double x, y, z;
     private double sx, sy, sz;
     private final double r;
 
-    public Particle(double x, double y, double z, double speedx,double speedy,double speedz, double radius) {
-        this.id = globalId++;
+    public Particle(double x, double y, double z, double speedx, double speedy, double speedz, double radius) {
+        this(globalId++, x, y, z, speedx, speedy, speedz, radius);
+    }
+
+    private Particle(int id, double x, double y, double z, double speedx, double speedy, double speedz, double radius) {
+        this.id = id;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -101,5 +105,9 @@ public class Particle {
         public double getSpeed() {
             return speed;
         }
+    }
+
+    public Particle hardCopy() {
+        return new Particle(id, x, y, z, sx, sy, sz, r);
     }
 }

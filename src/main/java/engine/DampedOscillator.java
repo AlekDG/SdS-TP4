@@ -12,13 +12,19 @@ public class DampedOscillator implements MovementModel {
     private final Particle particle;
     private final double deltaT;
 
-    public DampedOscillator(double K, double gamma, double mass, double deltaT) {
+    public DampedOscillator(double K, double gamma, double A, double mass, double deltaT) {
+        this(
+                K, gamma, mass, deltaT,
+                new Particle(0, A, 0, 0, -A*gamma/(2*mass), 0, 0)
+        );
+    }
+
+    private DampedOscillator(double K, double gamma, double mass, double deltaT, Particle particle) {
         this.K = K;
         this.gamma = gamma;
         this.mass = mass;
         this.deltaT = deltaT;
-        double A = 1;
-        particle = new Particle(0, 0, 0, 0, -A*gamma/(2*mass), 0, 0);
+        this.particle = particle;
     }
 
     @Override
@@ -43,11 +49,11 @@ public class DampedOscillator implements MovementModel {
 
     @Override
     public MovementModel hardCopyModel() {
-        return new DampedOscillator(K, gamma, mass, deltaT);
+        return new DampedOscillator(K, gamma, mass, deltaT, particle.hardCopy());
     }
 
     public static void main(String[] args) {
-        MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 70, Math.pow(10, -2));
+        MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70, Math.pow(10, -2));
         EstimationMethod estimationMethod = new EstimationMethod(model, 5);
         Iterator<Time> timeIt;
         timeIt = estimationMethod.verletEstimation();
