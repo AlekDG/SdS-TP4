@@ -1,0 +1,29 @@
+import engine.DampedOscillator;
+import engine.EstimationMethod;
+import engine.MovementModel;
+import engine.Time;
+import tools.PostProcessor;
+
+import java.io.IOException;
+import java.util.Iterator;
+public class Main{
+    public static void main(String[] args) throws IOException {
+        MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70, Math.pow(10, -2));
+        EstimationMethod estimationMethod = new EstimationMethod(model, 5);
+        Iterator<Time> timeIt;
+        timeIt = estimationMethod.verletEstimation();
+        try (PostProcessor postProcessor = new PostProcessor("verlet.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
+        }
+
+        timeIt = estimationMethod.beemanEstimation();
+        try (PostProcessor postProcessor = new PostProcessor("beeman.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
+        }
+
+        timeIt = estimationMethod.gearEstimation();
+        try (PostProcessor postProcessor = new PostProcessor("gear.txt")) {
+            timeIt.forEachRemaining(postProcessor::processTime);
+        }
+    }
+}
