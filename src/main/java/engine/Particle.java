@@ -12,6 +12,7 @@ public class Particle {
         this.id = globalId++;
         this.x = x;
         this.y = y;
+        this.z = z;
         this.sx = speedx;
         this.sy = speedy;
         this.sz = speedz;
@@ -35,6 +36,15 @@ public class Particle {
             new PosSpeedPair(y, sy),
             new PosSpeedPair(z, sz)
         };
+    }
+
+    public void setPositionAndSpeedPair(PosSpeedPair[] posAndSpeedPair) {
+        x = posAndSpeedPair[0].getPos();
+        sx = posAndSpeedPair[0].getSpeed();
+        y = posAndSpeedPair[1].getPos();
+        sy = posAndSpeedPair[1].getSpeed();
+        z = posAndSpeedPair[2].getPos();
+        sz = posAndSpeedPair[2].getSpeed();
     }
 
     public double getX() {

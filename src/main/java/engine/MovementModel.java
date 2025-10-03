@@ -3,7 +3,7 @@ package engine;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public interface MovementModel extends Iterable<Time> {
+public interface MovementModel {
 
     BiFunction<Double, Double, Double> forceFunction();
 
@@ -12,4 +12,6 @@ public interface MovementModel extends Iterable<Time> {
     List<Particle> particles();
 
     double deltaT();
+
+    MovementModel hardCopyModel();
 }
