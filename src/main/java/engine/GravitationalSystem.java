@@ -13,10 +13,10 @@ public class GravitationalSystem{
 
     public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G) {
         this.particles = particles;
-        this.deltaT=deltaT;
-        this.mass=mass;
-        this.particleCount=particles.size();
-        this.G=G;
+        this.deltaT = deltaT;
+        this.mass = mass;
+        this.particleCount = particles.size();
+        this.G = G;
     }
 
     public double mass() {
@@ -47,17 +47,17 @@ public class GravitationalSystem{
     private double kineticEnergy(){
         double totalEnergy=0;
         for(Particle p : particles){
-            totalEnergy+=Math.pow( p.getSpeedAbs(),2)*(double)(mass/2);
+            totalEnergy += Math.pow(p.getSpeedAbs(), 2) * (double) (mass / 2);
         }
         return totalEnergy;
     }
 
     private double potentialEnergy(){
-        double totalEnergy=0;
+        double totalEnergy = 0;
         for(Particle p : particles){
-            for(int i=particles.indexOf(p)+1; i<particleCount; i++){
+            for(int i = particles.indexOf(p) + 1; i < particleCount; i++){
                 Particle p2 = particles.get(i);
-                totalEnergy+=(-G*mass*mass)/p.getDistance(p2);
+                totalEnergy += (-G * mass *mass) / p.getDistance(p2);
             }
         }
         return totalEnergy;
@@ -69,13 +69,13 @@ public class GravitationalSystem{
         //Taking square root is computationally expensive and doesn't change order because
         //if(a<=b) then(sqrt(a)<=sqrt(b))
         particles.sort(Comparator.comparingDouble(
-                p -> p.getX()*p.getX() + p.getY()*p.getY() + p.getZ()*p.getZ()
+                p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()
         ));
     }
 
     public double halfMassRadius(){
         double hmr;
-        Particle midParticle = particles.get(particleCount/2);
+        Particle midParticle = particles.get(particleCount / 2);
         hmr = midParticle.getDistanceAbs();
         return hmr;
     }

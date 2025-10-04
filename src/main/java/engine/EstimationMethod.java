@@ -182,6 +182,9 @@ public class EstimationMethod {
                     double rPred =  taylorValueForList(new double[] {pos, speed, r2, r3, r4, r5});
                     double r1Pred = taylorValueForList(new double[] {speed, r2, r3, r4, r5});
                     double r2Pred = taylorValueForList(new double[] {r2, r3, r4, r5});
+                    double r3Pred = taylorValueForList(new double[] {r3, r4, r5});
+                    double r4Pred = taylorValueForList(new double[] {r4, r5});
+                    double r5Pred = taylorValueForList(new double[] {r5});
 
                     double deltaA = model.getR2().apply(rPred, r1Pred) - r2Pred;
                     double deltaR2 = deltaA * deltaTPow2 / factorial(2); // factor de corrección
@@ -193,6 +196,10 @@ public class EstimationMethod {
                     else
                         c0 = 3.0 / 20.0;
                     double c1 = 251.0 / 360.0;
+                    double c2;
+                    double c3;
+                    double c4;
+                    double c5;
 
                     double rCorr  = rPred  + c0 * deltaR2;
                     double r1Corr = r1Pred + c1 * deltaR2 / deltaT;

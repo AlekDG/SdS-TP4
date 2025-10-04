@@ -1,21 +1,21 @@
 package engine;
 
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 public interface MovementModel {
 
-    BiFunction<Double, Double, Double> forceFunction();
+    BinaryOperator<Double> forceFunction();
 
-    default BiFunction<Double, Double, Double> getR2() {
+    default BinaryOperator<Double> getR2() {
         return (pos, speed) -> forceFunction().apply(pos, speed) / mass();
     }
 
-    BiFunction<Double, Double, Double> getR3();
+    BinaryOperator<Double> getR3();
 
-    BiFunction<Double, Double, Double> getR4();
+    BinaryOperator<Double> getR4();
 
-    BiFunction<Double, Double, Double> getR5();
+    BinaryOperator<Double> getR5();
 
     double mass();
 

@@ -1,7 +1,7 @@
 package engine;
 
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 public class DampedOscillator implements MovementModel {
 
@@ -27,22 +27,22 @@ public class DampedOscillator implements MovementModel {
     }
 
     @Override
-    public BiFunction<Double, Double, Double> forceFunction() {
+    public BinaryOperator<Double> forceFunction() {
         return (pos, speed) -> -K*pos - gamma*speed;
     }
 
     @Override
-    public BiFunction<Double, Double, Double> getR3() {
+    public BinaryOperator<Double> getR3() {
         return (r1, r2) -> forceFunction().apply(r1, r2) / mass;
     }
 
     @Override
-    public BiFunction<Double, Double, Double> getR4() {
+    public BinaryOperator<Double> getR4() {
         return (r2, r3) -> forceFunction().apply(r2, r3) / mass;
     }
 
     @Override
-    public BiFunction<Double, Double, Double> getR5() {
+    public BinaryOperator<Double> getR5() {
         return (r3, r4) -> forceFunction().apply(r3, r4) / mass;
     }
 
