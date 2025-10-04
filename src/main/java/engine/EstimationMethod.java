@@ -153,12 +153,34 @@ public class EstimationMethod {
         private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
+        private final double[][][] prevGears;
+        private final static int COEFFICIENT_AMOUNT = 6;
 
         public GearIterator() {
             time = 0;
             modelCopy = model.hardCopyModel();
             deltaT = modelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
+            // for each particle and axis, I store it's previous coefficients
+            prevGears = new double[model.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
+            for (Particle p : modelCopy.particles()) {
+                for (int i = 0; i < Particle.DIMENSION; i++) {
+                    Particle.PosSpeedPair pair = p.getPositionAndSpeedPair()[i];
+                    double pos = pair.getPos();
+                    double speed = pair.getSpeed();
+                    double r2 = model.getR2().apply(pos, speed);
+                    double r3 = model.getR3().apply(speed, r2);
+                    double r4 = model.getR4().apply(r2, r3);
+                    double r5 = model.getR5().apply(r3, r4);
+                    prevGears[p.getId()][i][0] = pos;
+                    prevGears[p.getId()][i][1] = speed;
+                    prevGears[p.getId()][i][2] = r2;
+                    prevGears[p.getId()][i][3] = r3;
+                    prevGears[p.getId()][i][4] = r4;
+                    prevGears[p.getId()][i][5] = r5;
+                }
+            }
+
         }
 
         @Override
@@ -171,13 +193,12 @@ public class EstimationMethod {
             for (Particle p : modelCopy.particles()) {
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
-                    double pos = p.getPositionAndSpeedPair()[i].getPos();
-                    double speed = p.getPositionAndSpeedPair()[i].getSpeed();
-                    double r2 = model.getR2().apply(pos, speed);
-                    //TODO: Esto no es lo que muestra el algoritmo que vimos en la teorica
-                    double r3 = model.getR3().apply(speed, r2);
-                    double r4 = model.getR4().apply(r2, r3);
-                    double r5 = model.getR5().apply(r3, r4);
+                    double pos = prevGears[p.getId()][i][0];
+                    double speed = prevGears[p.getId()][i][1];
+                    double r2 = prevGears[p.getId()][i][2];
+                    double r3 = prevGears[p.getId()][i][3];
+                    double r4 = prevGears[p.getId()][i][4];
+                    double r5 = prevGears[p.getId()][i][5];
 
                     double rPred =  taylorValueForList(new double[] {pos, speed, r2, r3, r4, r5});
                     double r1Pred = taylorValueForList(new double[] {speed, r2, r3, r4, r5});
@@ -186,51 +207,60 @@ public class EstimationMethod {
                     double r4Pred = taylorValueForList(new double[] {r4, r5});
                     double r5Pred = taylorValueForList(new double[] {r5});
 
-                    double deltaA = model.getR2().apply(rPred, r1Pred) - r2Pred;
+                    double deltaA = modelCopy.getR2().apply(rPred, r1Pred) - r2Pred;
                     double deltaR2 = deltaA * deltaTPow2 / factorial(2); // factor de corrección
 
-                    // For Gear Order 5
-                    double c0;
-                    if (model.isForceFunctionSpeedDependant())
-                        c0 = 3.0 / 16.0;
-                    else
-                        c0 = 3.0 / 20.0;
-                    double c1 = 251.0 / 360.0;
-                    double c2;
-                    double c3;
-                    double c4;
-                    double c5;
+                    double posCorr = rPred + correction(0, deltaR2, deltaT);
+                    double speedCorr = r1Pred + correction(1, deltaR2, deltaT);
+                    prevGears[p.getId()][i][0] = posCorr;
+                    prevGears[p.getId()][i][1] = speedCorr;
+                    prevGears[p.getId()][i][2] = r2Pred + correction(2, deltaR2, deltaT);
+                    prevGears[p.getId()][i][3] = r3Pred + correction(3, deltaR2, deltaT);
+                    prevGears[p.getId()][i][4] = r4Pred + correction(4, deltaR2, deltaT);
+                    prevGears[p.getId()][i][5] = r5Pred + correction(5, deltaR2, deltaT);
 
-                    double rCorr  = rPred  + c0 * deltaR2;
-                    double r1Corr = r1Pred + c1 * deltaR2 / deltaT;
-                    //TODO: Deberia hacer las correcciones de los demas Rs y actualizar el Taylor
-
-                    newPosAndSpeed[i] = new Particle.PosSpeedPair(rCorr, r1Corr);
+                    newPosAndSpeed[i] = new Particle.PosSpeedPair(posCorr, speedCorr);
                 }
                 p.setPositionAndSpeedPair(newPosAndSpeed);
             }
             time += deltaT;
             return new Time(time, modelCopy.particles());
         }
-    }
 
-    private long factorial(int n) {
-        if (n <= 1)
-            return 1;
-        long toReturn = 1;
-        for (int i = 2; i <= n; i++) {
-            toReturn *= i;
+        private long factorial(int n) {
+            if (n <= 1)
+                return 1;
+            long toReturn = 1;
+            for (int i = 2; i <= n; i++) {
+                toReturn *= i;
+            }
+            return toReturn;
         }
-        return toReturn;
-    }
 
-    private double taylorValueForList(double[] derivates) {
-        double deltaT = model.deltaT();
-        double total = 0;
-        for (int i = 0; i < derivates.length; i++) {
-            total += derivates[i] * Math.pow(deltaT, i) / factorial(i);
+        private double taylorValueForList(double[] derivates) {
+            double deltaT = model.deltaT();
+            double total = 0;
+            for (int i = 0; i < derivates.length; i++) {
+                total += derivates[i] * Math.pow(deltaT, i) / factorial(i);
+            }
+            return total;
         }
-        return total;
-    }
 
+        private double correction(int q, double deltaR2, double deltaT) {
+            // For Gear Order 5
+            double a0;
+            if (modelCopy.isForceFunctionSpeedDependant())
+                a0 = 3.0 / 16.0;
+            else
+                a0 = 3.0 / 20.0;
+            double a1 = 251.0 / 360.0;
+            double a2 = 1.0;
+            double a3 = 11.0 / 18.0;
+            double a4 = 1.0 / 6.0;
+            double a5 = 1.0 / 60.0;
+
+            double[] aCoefficients = new double[] {a0, a1, a2, a3, a4, a5};
+            return aCoefficients[q] * deltaR2 * factorial(q) / Math.pow(deltaT, q);
+        }
+    }
 }
