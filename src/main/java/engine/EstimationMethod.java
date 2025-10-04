@@ -174,6 +174,7 @@ public class EstimationMethod {
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
                     double speed = p.getPositionAndSpeedPair()[i].getSpeed();
                     double r2 = model.getR2().apply(pos, speed);
+                    //TODO: Esto no es lo que muestra el algoritmo que vimos en la teorica
                     double r3 = model.getR3().apply(speed, r2);
                     double r4 = model.getR4().apply(r2, r3);
                     double r5 = model.getR5().apply(r3, r4);
@@ -195,6 +196,7 @@ public class EstimationMethod {
 
                     double rCorr  = rPred  + c0 * deltaR2;
                     double r1Corr = r1Pred + c1 * deltaR2 / deltaT;
+                    //TODO: Deberia hacer las correcciones de los demas Rs y actualizar el Taylor
 
                     newPosAndSpeed[i] = new Particle.PosSpeedPair(rCorr, r1Corr);
                 }

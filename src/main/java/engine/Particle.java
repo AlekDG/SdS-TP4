@@ -35,6 +35,10 @@ public class Particle {
         return sz;
     }
 
+    public double getSpeedAbs(){
+        return Math.sqrt(sx*sx + sy*sy + sz*sz);
+    }
+
     public PosSpeedPair[] getPositionAndSpeedPair() { return new PosSpeedPair[] {
             new PosSpeedPair(x, sx),
             new PosSpeedPair(y, sy),
@@ -61,6 +65,16 @@ public class Particle {
 
     public double getZ() {
         return z;
+    }
+
+    public double getDistanceAbs(){
+        return Math.sqrt(sx*sx + sy*sy + sz*sz);
+    }
+
+    public double getDistance(Particle p) {
+        //TODO: Ask teach if this is measured Edge-to-edge or center of mass to center of mass
+        //Cause EVERYTHING else is center of mass
+        return Math.sqrt(Math.pow(x-p.x,2) + Math.pow(y-p.y,2) + Math.pow(z-p.z,2));
     }
 
     public double getRadius() {
