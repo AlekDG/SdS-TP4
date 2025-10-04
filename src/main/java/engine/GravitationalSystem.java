@@ -10,13 +10,15 @@ public class GravitationalSystem{
     private final double deltaT;
     private final int particleCount;
     private final double G;
+    public double h;
 
-    public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G) {
+    public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G, double h) {
         this.particles = particles;
         this.deltaT = deltaT;
         this.mass = mass;
         this.particleCount = particles.size();
         this.G = G;
+        this.h = h;
     }
 
     public double mass() {
@@ -47,7 +49,7 @@ public class GravitationalSystem{
     private double kineticEnergy(){
         double totalEnergy=0;
         for(Particle p : particles){
-            totalEnergy += Math.pow(p.getSpeedAbs(), 2) * (double) (mass / 2);
+            totalEnergy += Math.pow(p.getSpeedAbs(), 2) * (mass / 2);
         }
         return totalEnergy;
     }
@@ -78,6 +80,31 @@ public class GravitationalSystem{
         Particle midParticle = particles.get(particleCount / 2);
         hmr = midParticle.getDistanceAbs();
         return hmr;
+    }
+
+    private double[] forceCalculation(Particle p1, Particle p2){
+        double d12 = p1.getDistance(p2);
+        double dx = p1.getX() - p2.getX();
+        double dy = p1.getY() - p2.getY();
+        double dz = p1.getZ() - p2.getZ();
+        double scalar = -G*mass*mass/Math.pow((Math.pow(d12,2)+Math.pow(h,2)),(double)3/2);
+        double v1 = dx*scalar;
+        double v2 = dy*scalar;
+        double v3 = dz*scalar;
+        return new double[]{v1, v2, v3};
+    }
+
+    public double[] forceArray(Particle p) {
+        double[] forces = new double[] {0,0,0};
+        for(Particle p2 : particles) {
+            if (!p.equals(p2)) {
+                double[] forces2 = forceCalculation(p, p2);
+                for (int i = 0; i < forces2.length && i < forces.length; i++) {
+                    forces[i] += forces2[i];
+                }
+            }
+        }
+        return forces;
     }
 
 
