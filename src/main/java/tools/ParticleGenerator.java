@@ -10,6 +10,7 @@ public class ParticleGenerator {
     private static final int X = 0;
     private static final int Y = 1;
     private static final int Z = 2;
+    private static final int VELOCITY_COMPONENTS = 3;
 
     public static void generate(
             int particleNumber,
@@ -23,22 +24,22 @@ public class ParticleGenerator {
             x = rand.nextGaussian();
             y = rand.nextGaussian();
             z = rand.nextGaussian();
-            double[] velocity = getInitialVelocityWithModulus(initialVelocityModulus);
+            double[] velocity = getInitialVelocityWithModulus(initialVelocityModulus, rand);
             consumer.accept(new Particle(x, y, z, velocity[X], velocity[Y], velocity[Z], radius));
         }
     }
 
-    public static double[] getInitialVelocityWithModulus(double modulus) {
-        Random rand = new Random(System.currentTimeMillis());
+    public static double[] getInitialVelocityWithModulus(double modulus, Random rand) {
+        double[] v = new double[VELOCITY_COMPONENTS];
         //Obtengo un vector aleatorio de componentes para v
-        double vx = rand.nextDouble();
-        double vy = rand.nextDouble();
-        double vz = rand.nextDouble();
+        for(int i = 0; i < VELOCITY_COMPONENTS; i++) {
+            v[i] = 2 * rand.nextDouble() - 1;
+        }
         //Normalizo el vector y ajusto el modulo
-        double norm = Math.sqrt(vx * vx + vy * vy + vz * vz);
-        vx = (vx / norm) * modulus;
-        vy = (vy / norm) * modulus;
-        vz = (vz / norm) * modulus;
-        return new double[]{vx, vy, vz};
+        double norm = Math.sqrt(v[X] * v[X] + v[Y] * v[Y] + v[Z] * v[Z]);
+        v[X] = (v[X] / norm) * modulus;
+        v[Y] = (v[Y] / norm) * modulus;
+        v[Z] = (v[Z] / norm) * modulus;
+        return v;
     }
 }
