@@ -7,6 +7,9 @@ public class Particle {
     private double x, y, z;
     private double sx, sy, sz;
     private final double r;
+    private static final int X = 0;
+    private static final int Y = 1;
+    private static final int Z = 2;
 
     public Particle(double x, double y, double z, double speedx, double speedy, double speedz, double radius) {
         this(globalId++, x, y, z, speedx, speedy, speedz, radius);
@@ -102,6 +105,22 @@ public class Particle {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Particle p && id == p.id;
+    }
+
+    public void updatePosition(double value, int axis) {
+        switch (axis) {
+            case X:
+                x = value;
+                break;
+            case Y:
+                y = value;
+                break;
+            case Z:
+                z = value;
+                break;
+            default:
+                break;
+        }
     }
 
     public static class PosSpeedPair {

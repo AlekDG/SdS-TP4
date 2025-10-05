@@ -94,7 +94,7 @@ public class GravitationalSystem{
         return new double[]{v1, v2, v3};
     }
 
-    public double[] forceArray(Particle p) {
+    private double[] forceArray(Particle p) {
         double[] forces = new double[] {0,0,0};
         for(Particle p2 : particles) {
             if (!p.equals(p2)) {
@@ -105,6 +105,14 @@ public class GravitationalSystem{
             }
         }
         return forces;
+    }
+
+    public double[][] getForceMatrix(){
+        double[][]forceMatrix = new double[particles.size()][3];
+        for(Particle p : particles){
+            forceMatrix[p.getId()] = forceArray(p);
+        }
+        return forceMatrix;
     }
 
 

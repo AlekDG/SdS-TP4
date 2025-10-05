@@ -5,8 +5,6 @@ import java.util.function.BinaryOperator;
 
 public interface MovementModel {
 
-    BinaryOperator<Double> forceFunction();
-
     default BinaryOperator<Double> getR2() {
         return (pos, speed) -> forceFunction().apply(pos, speed) / mass();
     }
@@ -26,4 +24,8 @@ public interface MovementModel {
     MovementModel hardCopyModel();
 
     boolean isForceFunctionSpeedDependant();
+
+    int particleCount();
+
+    double[][] getForceMatrix();
 }
