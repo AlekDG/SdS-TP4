@@ -77,8 +77,8 @@ public class DampedOscillator implements MovementModel {
 
     @Override
     public double[][] getForceMatrix() {
-        double[][] forceMatrix = new double[1][1];
-        forceMatrix[0][0] = forceFunction().apply(particle.getPositionAndSpeedPair()[0].getPos(),particle.getPositionAndSpeedPair()[0].getSpeed());
+        double[][] forceMatrix = {{0,0,0}};
+        forceMatrix[0][1] = forceFunction().apply(particle.getPositionAndSpeedPair()[1].getPos(), particle.getPositionAndSpeedPair()[1].getSpeed());
         return forceMatrix;
     }
 
