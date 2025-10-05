@@ -5,9 +5,7 @@ import java.util.function.BinaryOperator;
 
 public interface MovementModel {
 
-    default BinaryOperator<Double> getR2() {
-        return (pos, speed) -> forceFunction().apply(pos, speed) / mass();
-    }
+    BinaryOperator<Double> getR2();
 
     BinaryOperator<Double> getR3();
 

@@ -26,9 +26,13 @@ public class DampedOscillator implements MovementModel {
         this.particle = particle;
     }
 
-    @Override
-    public BinaryOperator<Double> forceFunction() {
+    private BinaryOperator<Double> forceFunction() {
         return (pos, speed) -> -K*pos - gamma*speed;
+    }
+
+    @Override
+    public BinaryOperator<Double> getR2() {
+        return (pos, speed) -> forceFunction().apply(pos, speed) / mass();
     }
 
     @Override
@@ -64,6 +68,18 @@ public class DampedOscillator implements MovementModel {
     @Override
     public boolean isForceFunctionSpeedDependant() {
         return true;
+    }
+
+    @Override
+    public int particleCount() {
+        return 1;
+    }
+
+    @Override
+    public double[][] getForceMatrix() {
+        double[][] forceMatrix = new double[1][1];
+        forceMatrix[0][0] = forceFunction().apply(particle.getPositionAndSpeedPair()[0].getPos(),particle.getPositionAndSpeedPair()[0].getSpeed());
+        return forceMatrix;
     }
 
     @Override
