@@ -43,6 +43,32 @@ public class PostProcessor implements Closeable {
         }
     }
 
+    public void processTimeAnim(Time time) {
+        try {
+            // write number of particles (XYZ frame header)
+            int n = time.particles().size();               // assumes particles() returns a List
+            writer.write(String.valueOf(n));
+            writer.newLine();
+            // comment line: include time value so it's visible to OVITO as the frame comment
+            writer.write("# t=" + String.format(Locale.US, "%.8f", time.time()));
+            writer.newLine();
+
+            // write one line per particle: element x y z vx vy vz
+            time.particles().forEach(this::processParticleAnim);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing on output file", e);
+        }
+    }
+
+    private void processParticleAnim(Particle particle) {
+        try {
+            writer.write(particle.xyzString()); // new method on Particle
+            writer.newLine();
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing on output file", e);
+        }
+    }
+
     public void processSystemEnergy(Time time, double energy) {
         try {
             writer.write(time.time() + "," + energy);

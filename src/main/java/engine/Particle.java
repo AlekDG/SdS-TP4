@@ -1,5 +1,7 @@
 package engine;
 
+import java.util.Locale;
+
 public class Particle {
     public static final int DIMENSION = 3;
     private static int globalId = 0;
@@ -89,6 +91,12 @@ public class Particle {
 
     public String csvString() {
         return "%.8f,%.8f,%.8f,%.8f,%.8f,%.8f".formatted(x, y, z, sx, sy, sz);
+    }
+    public String xyzString() {
+        // Use an element/type token first (OVITO expects an element or type name)
+        // then x y z vx vy vz
+        // Keep Locale.US to force dot decimal separator
+        return String.format(Locale.US, "P %.8f %.8f %.8f %.8f %.8f %.8f", x, y, z, sx, sy, sz);
     }
 
     public int getId() {
