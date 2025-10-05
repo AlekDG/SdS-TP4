@@ -43,6 +43,15 @@ public class PostProcessor implements Closeable {
         }
     }
 
+    public void processSystemEnergy(Time time, double energy) {
+        try {
+            writer.write(time.time() + "," + energy);
+            writer.newLine();
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing on output file");
+        }
+    }
+
     @Override
     public void close() throws IOException {
         writer.close();
