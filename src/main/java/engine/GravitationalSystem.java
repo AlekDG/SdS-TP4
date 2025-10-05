@@ -3,8 +3,7 @@ package engine;
 import java.util.Comparator;
 import java.util.List;
 
-//TODO: Make this implement MovementModel when that interface gets refactored/fixed
-public class GravitationalSystem{
+public class GravitationalSystem implements MovementModel {
     private final List<Particle> particles;
     private final double mass;
     private final double deltaT;
@@ -21,25 +20,30 @@ public class GravitationalSystem{
         this.h = h;
     }
 
+    @Override
     public double mass() {
         return mass;
     }
 
+    @Override
     public List<Particle> particles() {
         return particles;
     }
 
+    @Override
     public double deltaT() {
         return deltaT;
     }
 
+    @Override
     public int particleCount() {
         return particleCount;
     }
 
+    @Override
     public MovementModel hardCopyModel() {
-        //TODO: Make a deep copy of the entire particle list. Will also be needed for collision
-        return null;
+        List<Particle> newParticles = particles.stream().map(Particle::hardCopy).toList();
+        return new GravitationalSystem(newParticles, mass, deltaT, G, h);
     }
 
     public double systemEnergy(){
@@ -65,11 +69,11 @@ public class GravitationalSystem{
         return totalEnergy;
     }
 
-    //Sorts particles based on how close they are to the center
-    //We're gonna need this for half-mass radius
+    // Sorts particles based on how close they are to the center
+    // We're gonna need this for half-mass radius
     public void particleSort(){
-        //Taking square root is computationally expensive and doesn't change order because
-        //if(a<=b) then(sqrt(a)<=sqrt(b))
+        // Taking square root is computationally expensive and doesn't change order because
+        // if(a<=b) then(sqrt(a)<=sqrt(b))
         particles.sort(Comparator.comparingDouble(
                 p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()
         ));
@@ -107,6 +111,7 @@ public class GravitationalSystem{
         return forces;
     }
 
+    @Override
     public double[][] getForceMatrix(){
         double[][]forceMatrix = new double[particles.size()][3];
         for(Particle p : particles){
@@ -115,9 +120,29 @@ public class GravitationalSystem{
         return forceMatrix;
     }
 
-
-
+    @Override
     public boolean isForceFunctionSpeedDependant() {
         return false;
+    }
+
+    // TODO everything below here -> Berni's doing it rn
+    @Override
+    public double[][] computeR2FromState(double[][] positions, double[][] velocities) {
+        return new double[0][];
+    }
+
+    @Override
+    public double[][] getR3Matrix() {
+        return new double[0][];
+    }
+
+    @Override
+    public double[][] getR4Matrix() {
+        return new double[0][];
+    }
+
+    @Override
+    public double[][] getR5Matrix() {
+        return new double[0][];
     }
 }
