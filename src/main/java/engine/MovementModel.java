@@ -1,17 +1,8 @@
 package engine;
 
 import java.util.List;
-import java.util.function.BinaryOperator;
 
 public interface MovementModel {
-
-    BinaryOperator<Double> getR2();
-
-    BinaryOperator<Double> getR3();
-
-    BinaryOperator<Double> getR4();
-
-    BinaryOperator<Double> getR5();
 
     double mass();
 
@@ -26,4 +17,24 @@ public interface MovementModel {
     int particleCount();
 
     double[][] getForceMatrix();
+
+    default double[][] getR2Matrix() {
+        double[][] R2Matrix = getForceMatrix();
+        for (int i = 0; i < particleCount(); i++) {
+            for (int j = 0; j < Particle.DIMENSION; j++) {
+                R2Matrix[i][j] = R2Matrix[i][j] / mass();
+            }
+        }
+        return R2Matrix;
+    }
+
+    double[][] computeR2FromState(double[][] positions, double[][] velocities);
+
+
+    double[][] getR3Matrix();
+
+    double[][] getR4Matrix();
+
+    double[][] getR5Matrix();
+
 }

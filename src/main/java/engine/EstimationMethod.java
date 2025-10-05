@@ -38,7 +38,7 @@ public class EstimationMethod {
             deltaT = modelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
             mass = modelCopy.mass();
-            prevPos = new double[model.particleCount()][Particle.DIMENSION];
+            prevPos = new double[modelCopy.particleCount()][Particle.DIMENSION];
             double[][] forceMatrix = modelCopy.getForceMatrix();
             // This initial loop is to get x(t - DeltaT) using euler
             for (Particle p : modelCopy.particles()) {
@@ -168,23 +168,43 @@ public class EstimationMethod {
         private final double deltaTPow2;
         private final double[][][] prevGears;
         private final static int COEFFICIENT_AMOUNT = 6;
+        int N;
+        int DIM = Particle.DIMENSION;
+        double[][] posPred;
+        double[][] velPred;
+        double[][] r2Pred;
+        double[][] r3Pred;
+        double[][] r4Pred;
+        double[][] r5Pred;
 
         public GearIterator() {
             time = 0;
             modelCopy = model.hardCopyModel();
+            N = modelCopy.particles().size();
+            posPred = new double[N][DIM];
+            velPred = new double[N][DIM];
+            r2Pred = new double[N][DIM];
+            r3Pred = new double[N][DIM];
+            r4Pred = new double[N][DIM];
+            r5Pred = new double[N][DIM];
+
             deltaT = modelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
             // for each particle and axis, I store it's previous coefficients
-            prevGears = new double[model.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
+            prevGears = new double[modelCopy.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
+            double[][] R2Matrix = modelCopy.getR2Matrix();
+            double[][] R3Matrix = modelCopy.getR3Matrix();
+            double[][] R4Matrix = modelCopy.getR4Matrix();
+            double[][] R5Matrix = modelCopy.getR5Matrix();
             for (Particle p : modelCopy.particles()) {
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     Particle.PosSpeedPair pair = p.getPositionAndSpeedPair()[i];
                     double pos = pair.getPos();
                     double speed = pair.getSpeed();
-                    double r2 = model.getR2().apply(pos, speed);
-                    double r3 = model.getR3().apply(speed, r2);
-                    double r4 = model.getR4().apply(r2, r3);
-                    double r5 = model.getR5().apply(r3, r4);
+                    double r2 = R2Matrix[p.getId()][i];
+                    double r3 = R3Matrix[p.getId()][i];
+                    double r4 = R4Matrix[p.getId()][i];
+                    double r5 = R5Matrix[p.getId()][i];
                     prevGears[p.getId()][i][0] = pos;
                     prevGears[p.getId()][i][1] = speed;
                     prevGears[p.getId()][i][2] = r2;
@@ -204,41 +224,60 @@ public class EstimationMethod {
         @Override
         public Time next() {
             for (Particle p : modelCopy.particles()) {
-                Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
-                for (int i = 0; i < Particle.DIMENSION; i++) {
-                    double pos = prevGears[p.getId()][i][0];
-                    double speed = prevGears[p.getId()][i][1];
-                    double r2 = prevGears[p.getId()][i][2];
-                    double r3 = prevGears[p.getId()][i][3];
-                    double r4 = prevGears[p.getId()][i][4];
-                    double r5 = prevGears[p.getId()][i][5];
+                int id = p.getId();
+                for (int d = 0; d < DIM; d++) {
+                    double pos = prevGears[id][d][0];
+                    double speed = prevGears[id][d][1];
+                    double r2 = prevGears[id][d][2];
+                    double r3 = prevGears[id][d][3];
+                    double r4 = prevGears[id][d][4];
+                    double r5 = prevGears[id][d][5];
 
-                    double rPred =  taylorValueForList(new double[] {pos, speed, r2, r3, r4, r5});
-                    double r1Pred = taylorValueForList(new double[] {speed, r2, r3, r4, r5});
-                    double r2Pred = taylorValueForList(new double[] {r2, r3, r4, r5});
-                    double r3Pred = taylorValueForList(new double[] {r3, r4, r5});
-                    double r4Pred = taylorValueForList(new double[] {r4, r5});
-                    double r5Pred = taylorValueForList(new double[] {r5});
+                    posPred[id][d] = taylorValueForList(new double[] {pos, speed, r2, r3, r4, r5});
+                    velPred[id][d] = taylorValueForList(new double[] {speed, r2, r3, r4, r5});
+                    r2Pred[id][d] = taylorValueForList(new double[] {r2, r3, r4, r5});
+                    r3Pred[id][d] = taylorValueForList(new double[] {r3, r4, r5});
+                    r4Pred[id][d] = taylorValueForList(new double[] {r4, r5});
+                    r5Pred[id][d] = taylorValueForList(new double[] {r5});
+                }
+            }
 
-                    double deltaA = modelCopy.getR2().apply(rPred, r1Pred) - r2Pred;
-                    double deltaR2 = deltaA * deltaTPow2 / factorial(2); // factor de corrección
+            double[][] r2Computed = modelCopy.computeR2FromState(posPred, velPred);
+
+            for (Particle p : modelCopy.particles()) {
+                int id = p.getId();
+                Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[DIM];
+
+                for (int d = 0; d < DIM; d++) {
+                    double rPred = posPred[id][d];
+                    double r1Pred = velPred[id][d];
+                    double r2p = r2Pred[id][d];
+                    double r3p = r3Pred[id][d];
+                    double r4p = r4Pred[id][d];
+                    double r5p = r5Pred[id][d];
+
+                    double deltaA = r2Computed[id][d] - r2p;
+                    double deltaR2 = deltaA * deltaTPow2 / 2;
 
                     double posCorr = rPred + correction(0, deltaR2, deltaT);
                     double speedCorr = r1Pred + correction(1, deltaR2, deltaT);
-                    prevGears[p.getId()][i][0] = posCorr;
-                    prevGears[p.getId()][i][1] = speedCorr;
-                    prevGears[p.getId()][i][2] = r2Pred + correction(2, deltaR2, deltaT);
-                    prevGears[p.getId()][i][3] = r3Pred + correction(3, deltaR2, deltaT);
-                    prevGears[p.getId()][i][4] = r4Pred + correction(4, deltaR2, deltaT);
-                    prevGears[p.getId()][i][5] = r5Pred + correction(5, deltaR2, deltaT);
 
-                    newPosAndSpeed[i] = new Particle.PosSpeedPair(posCorr, speedCorr);
+                    prevGears[id][d][0] = posCorr;
+                    prevGears[id][d][1] = speedCorr;
+                    prevGears[id][d][2] = r2p + correction(2, deltaR2, deltaT);
+                    prevGears[id][d][3] = r3p + correction(3, deltaR2, deltaT);
+                    prevGears[id][d][4] = r4p + correction(4, deltaR2, deltaT);
+                    prevGears[id][d][5] = r5p + correction(5, deltaR2, deltaT);
+
+                    newPosAndSpeed[d] = new Particle.PosSpeedPair(posCorr, speedCorr);
                 }
                 p.setPositionAndSpeedPair(newPosAndSpeed);
             }
+
             time += deltaT;
             return new Time(time, modelCopy.particles());
         }
+
 
         private long factorial(int n) {
             if (n <= 1)
@@ -251,7 +290,7 @@ public class EstimationMethod {
         }
 
         private double taylorValueForList(double[] derivates) {
-            double deltaT = model.deltaT();
+            double deltaT = modelCopy.deltaT();
             double total = 0;
             for (int i = 0; i < derivates.length; i++) {
                 total += derivates[i] * Math.pow(deltaT, i) / factorial(i);

@@ -30,23 +30,15 @@ public class DampedOscillator implements MovementModel {
         return (pos, speed) -> -K*pos - gamma*speed;
     }
 
-    @Override
-    public BinaryOperator<Double> getR2() {
-        return (pos, speed) -> forceFunction().apply(pos, speed) / mass();
-    }
-
-    @Override
-    public BinaryOperator<Double> getR3() {
+    private BinaryOperator<Double> getR3() {
         return (r1, r2) -> forceFunction().apply(r1, r2) / mass;
     }
 
-    @Override
-    public BinaryOperator<Double> getR4() {
+    private BinaryOperator<Double> getR4() {
         return (r2, r3) -> forceFunction().apply(r2, r3) / mass;
     }
 
-    @Override
-    public BinaryOperator<Double> getR5() {
+    private BinaryOperator<Double> getR5() {
         return (r3, r4) -> forceFunction().apply(r3, r4) / mass;
     }
 
@@ -77,9 +69,42 @@ public class DampedOscillator implements MovementModel {
 
     @Override
     public double[][] getForceMatrix() {
-        double[][] forceMatrix = {{0,0,0}};
-        forceMatrix[0][1] = forceFunction().apply(particle.getPositionAndSpeedPair()[1].getPos(), particle.getPositionAndSpeedPair()[1].getSpeed());
+        double[][] forceMatrix = {{0, 0, 0}};
+        forceMatrix[0][1] = forceFunction().apply(particle.getY(), particle.getSpeedY());
         return forceMatrix;
+    }
+
+    @Override
+    public double[][] computeR2FromState(double[][] positions, double[][] velocities) {
+        double[][] R2Matrix = new double[1][Particle.DIMENSION];
+        R2Matrix[0][1] = forceFunction().apply(positions[0][1], velocities[0][1]);
+        return R2Matrix;
+    }
+
+    @Override
+    public double[][] getR3Matrix() {
+        double[][] R2Matrix = getR2Matrix();
+        double[][] R3Matrix = new double[1][Particle.DIMENSION];
+        R3Matrix[0][1] = getR3().apply(particle.getSpeedY(), R2Matrix[0][1]);
+        return R3Matrix;
+    }
+
+    @Override
+    public double[][] getR4Matrix() {
+        double[][] R2Matrix = getR2Matrix();
+        double[][] R3Matrix = getR3Matrix();
+        double[][] R4Matrix = new double[1][Particle.DIMENSION];
+        R4Matrix[0][1] = getR4().apply(R2Matrix[0][1], R3Matrix[0][1]);
+        return R4Matrix;
+    }
+
+    @Override
+    public double[][] getR5Matrix() {
+        double[][] R3Matrix = getR2Matrix();
+        double[][] R4Matrix = getR3Matrix();
+        double[][] R5Matrix = new double[1][Particle.DIMENSION];
+        R5Matrix[0][1] = getR5().apply(R3Matrix[0][1], R4Matrix[0][1]);
+        return R5Matrix;
     }
 
     @Override
