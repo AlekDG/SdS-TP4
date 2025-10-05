@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class PostProcessor implements Closeable {
@@ -45,25 +46,23 @@ public class PostProcessor implements Closeable {
 
     public void processTimeAnim(Time time) {
         try {
-            // write number of particles (XYZ frame header)
-            int n = time.particles().size();               // assumes particles() returns a List
+            List<Particle> parts = time.particles(); // if it's Iterable, collect to a List first
+            int n = parts.size();
             writer.write(String.valueOf(n));
             writer.newLine();
-            // comment line: include time value so it's visible to OVITO as the frame comment
-            writer.write("# t=" + String.format(Locale.US, "%.8f", time.time()));
+
+            // Extended XYZ header line: include Lattice and Properties (and Time)
+            // Use Locale.US to ensure dot decimal separator
+            String header = String.format(Locale.US,
+                    "Lattice=\"0 0 0 0 0 0 0 0 0\" Properties=species:S:1:pos:R:3:vel:R:3 Time=%.8f",
+                    time.time());
+            writer.write(header);
             writer.newLine();
 
-            // write one line per particle: element x y z vx vy vz
-            time.particles().forEach(this::processParticleAnim);
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing on output file", e);
-        }
-    }
-
-    private void processParticleAnim(Particle particle) {
-        try {
-            writer.write(particle.xyzString()); // new method on Particle
-            writer.newLine();
+            for (Particle p : parts) {
+                writer.write(p.extXyzLine());
+                writer.newLine();
+            }
         } catch (IOException e) {
             throw new RuntimeException("Error writing on output file", e);
         }

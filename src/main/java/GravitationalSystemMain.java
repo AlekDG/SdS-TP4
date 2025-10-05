@@ -31,9 +31,11 @@ public class GravitationalSystemMain {
         Iterator<Time> timeIt;
         timeIt = estimationMethod.verletEstimation();
         try (PostProcessor postProcessor = new PostProcessor("verletGravitational.txt") ;
-                PostProcessor postProcessorEnergy = new PostProcessor("energyVerletGravitational.txt")) {
+                PostProcessor postProcessorEnergy = new PostProcessor("energyVerletGravitational.txt");
+            PostProcessor animProcessor = new PostProcessor("animVerletGravitational.txt")) {
             timeIt.forEachRemaining( time -> {
                 postProcessor.processTime(time);
+                animProcessor.processTimeAnim(time);
                 postProcessorEnergy.processSystemEnergy(time, ((GravitationalSystem) system).systemEnergy());
             });
         }
