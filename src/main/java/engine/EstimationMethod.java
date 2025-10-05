@@ -6,6 +6,7 @@ import java.util.Iterator;
 public class EstimationMethod {
 
     private final MovementModel model;
+    private MovementModel currentModelCopy;
     private final double endTime;
 
     public EstimationMethod(MovementModel model, double endTime) {
@@ -25,9 +26,13 @@ public class EstimationMethod {
         return new GearIterator();
     }
 
+    public MovementModel getCurrentModelCopy() {
+        return currentModelCopy;
+    }
+
     private class VerletIterator implements Iterator<Time> {
         private double time;
-        private final MovementModel modelCopy;
+        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         private final double mass;
@@ -35,14 +40,14 @@ public class EstimationMethod {
 
         public VerletIterator() {
             time = 0;
-            modelCopy = model.hardCopyModel();
-            deltaT = modelCopy.deltaT();
+            currentModelCopy = model.hardCopyModel();
+            deltaT = currentModelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
-            mass = modelCopy.mass();
-            prevPos = new double[modelCopy.particleCount()][Particle.DIMENSION];
-            double[][] forceMatrix = modelCopy.getForceMatrix();
+            mass = currentModelCopy.mass();
+            prevPos = new double[currentModelCopy.particleCount()][Particle.DIMENSION];
+            double[][] forceMatrix = currentModelCopy.getForceMatrix();
             // This initial loop is to get x(t - DeltaT) using euler
-            for (Particle p : modelCopy.particles()) {
+            for (Particle p : currentModelCopy.particles()) {
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
                     double speed = p.getPositionAndSpeedPair()[i].getSpeed();
@@ -60,9 +65,9 @@ public class EstimationMethod {
 
         @Override
         public Time next() {
-            double[][] forceMatrix = modelCopy.getForceMatrix();
-            double[][] currentPos = new double[modelCopy.particleCount()][Particle.DIMENSION];
-            for (Particle p : modelCopy.particles()) {
+            double[][] forceMatrix = currentModelCopy.getForceMatrix();
+            double[][] currentPos = new double[currentModelCopy.particleCount()][Particle.DIMENSION];
+            for (Particle p : currentModelCopy.particles()) {
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
                     double force = forceMatrix[p.getId()][i];
@@ -70,8 +75,8 @@ public class EstimationMethod {
                     p.updatePosition(2 * pos - prevPos[p.getId()][i] + deltaTPow2 * force / mass, i);
                 }
             }
-            double[][] nextForceMatrix = modelCopy.getForceMatrix();
-            for(Particle p : modelCopy.particles()) {
+            double[][] nextForceMatrix = currentModelCopy.getForceMatrix();
+            for(Particle p : currentModelCopy.particles()) {
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     double nextForce = nextForceMatrix[p.getId()][i];
@@ -85,13 +90,13 @@ public class EstimationMethod {
                     .map(double[]::clone)
                     .toArray(double[][]::new);
             time += deltaT;
-            return new Time(time, modelCopy.particles());
+            return new Time(time, currentModelCopy.particles());
         }
     }
 
     private class BeemanIterator implements Iterator<Time> {
         private double time;
-        private final MovementModel modelCopy;
+        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         private final double mass;
@@ -100,14 +105,14 @@ public class EstimationMethod {
 
         public BeemanIterator() {
             time = 0;
-            modelCopy = model.hardCopyModel();
-            deltaT = modelCopy.deltaT();
+            currentModelCopy = model.hardCopyModel();
+            deltaT = currentModelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
-            mass = modelCopy.mass();
-            prevPosAndSpeed = new Particle.PosSpeedPair[modelCopy.particleCount()][Particle.DIMENSION];
-            prevForceMatrix = modelCopy.getForceMatrix();
+            mass = currentModelCopy.mass();
+            prevPosAndSpeed = new Particle.PosSpeedPair[currentModelCopy.particleCount()][Particle.DIMENSION];
+            prevForceMatrix = currentModelCopy.getForceMatrix();
             // This initial loop is to get a(t - DeltaT) using euler
-            for (Particle p : modelCopy.particles()) {
+            for (Particle p : currentModelCopy.particles()) {
                 double[] forceArray = prevForceMatrix[p.getId()];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
@@ -128,8 +133,8 @@ public class EstimationMethod {
 
         @Override
         public Time next() {
-            double[][] forceMatrix = modelCopy.getForceMatrix();
-            for (Particle p : modelCopy.particles()) {
+            double[][] forceMatrix = currentModelCopy.getForceMatrix();
+            for (Particle p : currentModelCopy.particles()) {
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
                 double[] forceArray = forceMatrix[p.getId()];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
@@ -144,8 +149,8 @@ public class EstimationMethod {
                 }
                 p.setPositionAndSpeedPair(newPosAndSpeed);
             }
-            double[][] nextForceMatrix = modelCopy.getForceMatrix();
-            for (Particle p : modelCopy.particles()) {
+            double[][] nextForceMatrix = currentModelCopy.getForceMatrix();
+            for (Particle p : currentModelCopy.particles()) {
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
                 double[] nextForceArray = nextForceMatrix[p.getId()];
                 double[] forceArray = forceMatrix[p.getId()];
@@ -159,13 +164,13 @@ public class EstimationMethod {
             }
             time += deltaT;
             prevForceMatrix = forceMatrix;
-            return new Time(time, modelCopy.particles());
+            return new Time(time, currentModelCopy.particles());
         }
     }
 
     private class GearIterator implements Iterator<Time> {
         private double time;
-        private final MovementModel modelCopy;
+        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         private final double[][][] prevGears;
@@ -181,8 +186,8 @@ public class EstimationMethod {
 
         public GearIterator() {
             time = 0;
-            modelCopy = model.hardCopyModel();
-            N = modelCopy.particles().size();
+            currentModelCopy = model.hardCopyModel();
+            N = currentModelCopy.particles().size();
             posPred = new double[N][DIM];
             velPred = new double[N][DIM];
             r2Pred = new double[N][DIM];
@@ -190,15 +195,15 @@ public class EstimationMethod {
             r4Pred = new double[N][DIM];
             r5Pred = new double[N][DIM];
 
-            deltaT = modelCopy.deltaT();
+            deltaT = currentModelCopy.deltaT();
             deltaTPow2 = Math.pow(deltaT, 2);
             // for each particle and axis, I store it's previous coefficients
-            prevGears = new double[modelCopy.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
-            double[][] R2Matrix = modelCopy.getR2Matrix();
-            double[][] R3Matrix = modelCopy.getR3Matrix();
-            double[][] R4Matrix = modelCopy.getR4Matrix();
-            double[][] R5Matrix = modelCopy.getR5Matrix();
-            for (Particle p : modelCopy.particles()) {
+            prevGears = new double[currentModelCopy.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
+            double[][] R2Matrix = currentModelCopy.getR2Matrix();
+            double[][] R3Matrix = currentModelCopy.getR3Matrix();
+            double[][] R4Matrix = currentModelCopy.getR4Matrix();
+            double[][] R5Matrix = currentModelCopy.getR5Matrix();
+            for (Particle p : currentModelCopy.particles()) {
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     Particle.PosSpeedPair pair = p.getPositionAndSpeedPair()[i];
                     double pos = pair.getPos();
@@ -225,7 +230,7 @@ public class EstimationMethod {
 
         @Override
         public Time next() {
-            for (Particle p : modelCopy.particles()) {
+            for (Particle p : currentModelCopy.particles()) {
                 int id = p.getId();
                 for (int d = 0; d < DIM; d++) {
                     double pos = prevGears[id][d][0];
@@ -244,9 +249,9 @@ public class EstimationMethod {
                 }
             }
 
-            double[][] r2Computed = modelCopy.computeR2FromState(posPred, velPred);
+            double[][] r2Computed = currentModelCopy.computeR2FromState(posPred, velPred);
 
-            for (Particle p : modelCopy.particles()) {
+            for (Particle p : currentModelCopy.particles()) {
                 int id = p.getId();
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[DIM];
 
@@ -277,7 +282,7 @@ public class EstimationMethod {
             }
 
             time += deltaT;
-            return new Time(time, modelCopy.particles());
+            return new Time(time, currentModelCopy.particles());
         }
 
 
@@ -292,7 +297,7 @@ public class EstimationMethod {
         }
 
         private double taylorValueForList(double[] derivates) {
-            double deltaT = modelCopy.deltaT();
+            double deltaT = currentModelCopy.deltaT();
             double total = 0;
             for (int i = 0; i < derivates.length; i++) {
                 total += derivates[i] * Math.pow(deltaT, i) / factorial(i);
@@ -303,7 +308,7 @@ public class EstimationMethod {
         private double correction(int q, double deltaR2, double deltaT) {
             // For Gear Order 5
             double a0;
-            if (modelCopy.isForceFunctionSpeedDependant())
+            if (currentModelCopy.isForceFunctionSpeedDependant())
                 a0 = 3.0 / 16.0;
             else
                 a0 = 3.0 / 20.0;
