@@ -146,11 +146,21 @@ public class EstimationMethod {
                     double prevForce = prevForceMatrix[p.getId()][i];
                     double nextPos = pos + speed * deltaT + 2 * deltaTPow2 * (force / (3 * mass)) - deltaTPow2 * prevForce / (6 * mass);
                     double nextSpeedPred = speed + 3 * deltaT * force / (2 * mass) - deltaT * prevForce / (2 * mass);
-
-                    double nextForce = modelCopy.forceFunction().apply(nextPos, nextSpeedPred);
+                    newPosAndSpeed[i] = new Particle.PosSpeedPair(nextPos,nextSpeedPred);
                     prevPosAndSpeed.get(p.getId()).set(i, new Particle.PosSpeedPair(pos, speed));
-                    double nextSpeed = speed + deltaT * nextForce / (3 * mass) + 5 * deltaT * force / (6 * mass) - deltaT * prevForce / (6 * mass);
-                    newPosAndSpeed[i] = new Particle.PosSpeedPair(nextPos, nextSpeed);
+                }
+                p.setPositionAndSpeedPair(newPosAndSpeed);
+            }
+            double[][] nextForceMatrix = modelCopy.getForceMatrix();
+            for (Particle p : modelCopy.particles()) {
+                Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
+                double[] nextForceArray = nextForceMatrix[p.getId()];
+                double[] forceArray = forceMatrix[p.getId()];
+                double[] prevForceArray = prevForceMatrix[p.getId()];
+                for (int i = 0; i < Particle.DIMENSION; i++) {
+                    double speed = prevPosAndSpeed.get(p.getId()).get(i).getSpeed();
+                    double nextSpeed = speed + deltaT * nextForceArray[i] / (3 * mass) + 5 * deltaT * forceArray[i] / (6 * mass) - deltaT * prevForceArray[i] / (6 * mass);
+                    newPosAndSpeed[i] = new Particle.PosSpeedPair(p.getPositionAndSpeedPair()[i].getPos(), nextSpeed);
                 }
                 p.setPositionAndSpeedPair(newPosAndSpeed);
             }
