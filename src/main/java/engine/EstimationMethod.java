@@ -1,5 +1,6 @@
 package engine;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class EstimationMethod {
@@ -30,7 +31,7 @@ public class EstimationMethod {
         private final double deltaT;
         private final double deltaTPow2;
         private final double mass;
-        private final double[][] prevPos;
+        private double[][] prevPos;
 
         public VerletIterator() {
             time = 0;
@@ -42,11 +43,10 @@ public class EstimationMethod {
             double[][] forceMatrix = modelCopy.getForceMatrix();
             // This initial loop is to get x(t - DeltaT) using euler
             for (Particle p : modelCopy.particles()) {
-                double[] forceArray = forceMatrix[p.getId()];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
                     double speed = p.getPositionAndSpeedPair()[i].getSpeed();
-                    double force = forceArray[i];
+                    double force = forceMatrix[p.getId()][i];
                     double prevPosAux = pos - deltaT * speed + deltaTPow2 * force / (2 * mass); // euler
                     prevPos[p.getId()][i] = prevPosAux;
                 }
@@ -61,28 +61,30 @@ public class EstimationMethod {
         @Override
         public Time next() {
             double[][] forceMatrix = modelCopy.getForceMatrix();
-            double[][] prevPositionArray = new double[modelCopy.particleCount()][Particle.DIMENSION];
+            double[][] currentPos = new double[modelCopy.particleCount()][Particle.DIMENSION];
             for (Particle p : modelCopy.particles()) {
-                double[] forceArray = forceMatrix[p.getId()];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
-                    prevPositionArray[p.getId()][i] = p.getPositionAndSpeedPair()[i].getPos();
                     double pos = p.getPositionAndSpeedPair()[i].getPos();
-                    double force = forceArray[i];
+                    double force = forceMatrix[p.getId()][i];
+                    currentPos[p.getId()][i] = pos;
                     p.updatePosition(2 * pos - prevPos[p.getId()][i] + deltaTPow2 * force / mass, i);
                 }
             }
             double[][] nextForceMatrix = modelCopy.getForceMatrix();
             for(Particle p : modelCopy.particles()) {
                 Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[Particle.DIMENSION];
-                double[] forceArray = nextForceMatrix[p.getId()];
                 for (int i = 0; i < Particle.DIMENSION; i++) {
-                    double nextForce = forceArray[i];
-                    double nextNextPos = 2 * p.getPositionAndSpeedPair()[i].getPos() - prevPositionArray[p.getId()][i] + deltaTPow2 * nextForce / mass;
-                    double nextSpeed = (nextNextPos - prevPositionArray[p.getId()][i]) / (2 * deltaT); // nextSpeedCorrected
+                    double nextForce = nextForceMatrix[p.getId()][i];
+                    double nextNextPos = 2 * p.getPositionAndSpeedPair()[i].getPos() - currentPos[p.getId()][i] + deltaTPow2 * nextForce / mass;
+                    double nextSpeed = (nextNextPos - currentPos[p.getId()][i]) / (2 * deltaT); // nextSpeedCorrected
                     newPosAndSpeed[i] = new Particle.PosSpeedPair(p.getPositionAndSpeedPair()[i].getPos(), nextSpeed);
                 }
                 p.setPositionAndSpeedPair(newPosAndSpeed);
-            }            time += deltaT;
+            }
+            prevPos = Arrays.stream(currentPos)
+                    .map(double[]::clone)
+                    .toArray(double[][]::new);
+            time += deltaT;
             return new Time(time, modelCopy.particles());
         }
     }

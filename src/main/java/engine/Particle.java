@@ -75,8 +75,6 @@ public class Particle {
     }
 
     public double getDistance(Particle p) {
-        //TODO: Ask teach if this is measured Edge-to-edge or center of mass to center of mass
-        //Cause EVERYTHING else is center of mass
         return Math.sqrt(Math.pow(x-p.x,2) + Math.pow(y-p.y,2) + Math.pow(z-p.z,2));
     }
 
@@ -90,7 +88,7 @@ public class Particle {
     }
 
     public String csvString() {
-        return "%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f".formatted(x, y, z, sx, sy, sz, r);
+        return "%.8f,%.8f,%.8f,%.8f,%.8f,%.8f".formatted(x, y, z, sx, sy, sz);
     }
 
     public int getId() {
