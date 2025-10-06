@@ -77,7 +77,7 @@ public class DampedOscillator implements MovementModel {
     @Override
     public double[][] computeR2FromState(double[][] positions, double[][] velocities) {
         double[][] R2Matrix = new double[1][Particle.DIMENSION];
-        R2Matrix[0][1] = forceFunction().apply(positions[0][1], velocities[0][1]);
+        R2Matrix[0][1] = forceFunction().apply(positions[0][1], velocities[0][1]) / mass();
         return R2Matrix;
     }
 
@@ -100,8 +100,8 @@ public class DampedOscillator implements MovementModel {
 
     @Override
     public double[][] getR5Matrix() {
-        double[][] R3Matrix = getR2Matrix();
-        double[][] R4Matrix = getR3Matrix();
+        double[][] R3Matrix = getR3Matrix();
+        double[][] R4Matrix = getR4Matrix();
         double[][] R5Matrix = new double[1][Particle.DIMENSION];
         R5Matrix[0][1] = getR5().apply(R3Matrix[0][1], R4Matrix[0][1]);
         return R5Matrix;
