@@ -24,7 +24,7 @@ public class GravitationalSystemMain {
         double delta_t = 0.1;//Double.parseDouble(System.getProperty(DT));
         double max_t = 100; // Double.parseDouble(System.getProperty(MAX_T));
         String outputFile = System.getProperty(OUTPUT_FILE);
-        int simulation = 0; //0 for deltaT optimization, 1 for rhm ....
+        int simulation = 2; //0 for deltaT optimization, 1 for rhm ....
 
         switch (simulation) {
             case 0 -> optimalDeltaT(n, max_t);
@@ -127,10 +127,12 @@ public class GravitationalSystemMain {
         timeIt = estimationMethod.beemanEstimation();
         MovementModel systemIteratorCopy2 = estimationMethod.getCurrentModelCopy();
         try (PostProcessor postProcessor = new PostProcessor("beemanGravitational.txt") ;
-             PostProcessor postProcessorEnergy = new PostProcessor("energyBeemanGravitational.txt")) {
+             PostProcessor postProcessorEnergy = new PostProcessor("energyBeemanGravitational.txt");
+             PostProcessor animProcessor2 = new PostProcessor("animBeemanGravitational.txt")) {
             timeIt.forEachRemaining( time -> {
                 postProcessor.processTime(time);
                 postProcessorEnergy.processSystemEnergy(time, ((GravitationalSystem) systemIteratorCopy2).systemEnergy());
+                animProcessor2.processTimeAnim(time);
             });
         }
 
@@ -139,10 +141,12 @@ public class GravitationalSystemMain {
         timeIt = estimationMethod.beemanEstimation();
         MovementModel systemIteratorCopy3 = estimationMethod.getCurrentModelCopy();
         try (PostProcessor postProcessor = new PostProcessor("gearGravitational.txt") ;
-             PostProcessor postProcessorEnergy = new PostProcessor("energyGearGravitational.txt")) {
+             PostProcessor postProcessorEnergy = new PostProcessor("energyGearGravitational.txt");
+             PostProcessor animProcessor3 = new PostProcessor("animGearGravitational.txt")) {
             timeIt.forEachRemaining( time -> {
                 postProcessor.processTime(time);
                 postProcessorEnergy.processSystemEnergy(time, ((GravitationalSystem) systemIteratorCopy3).systemEnergy());
+                animProcessor3.processTimeAnim(time);
             });
         }
     }
