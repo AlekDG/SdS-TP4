@@ -143,7 +143,7 @@ public class GravitationalSystemMain {
 
         System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Gear method.");
         System.out.println("System energy before: " + ((GravitationalSystem) system).systemEnergy());
-        timeIt = estimationMethod.beemanEstimation();
+        timeIt = estimationMethod.gearEstimation();
         MovementModel systemIteratorCopy3 = estimationMethod.getCurrentModelCopy();
         i.set(0);
         try (PostProcessor postProcessor = new PostProcessor("gearGravitational.txt") ;
