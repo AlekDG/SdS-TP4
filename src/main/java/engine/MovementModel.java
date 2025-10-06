@@ -19,13 +19,12 @@ public interface MovementModel {
     double[][] getForceMatrix();
 
     default double[][] getR2Matrix() {
-        double[][] R2Matrix = getForceMatrix();
-        for (int i = 0; i < particleCount(); i++) {
-            for (int j = 0; j < Particle.DIMENSION; j++) {
-                R2Matrix[i][j] = R2Matrix[i][j] / mass();
-            }
-        }
-        return R2Matrix;
+        double[][] F = getForceMatrix();
+        double[][] R2 = new double[particleCount()][Particle.DIMENSION];
+        for (int i = 0; i < particleCount(); i++)
+            for (int j = 0; j < Particle.DIMENSION; j++)
+                R2[i][j] = F[i][j] / mass();
+        return R2;
     }
 
     double[][] computeR2FromState(double[][] positions, double[][] velocities);
