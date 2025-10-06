@@ -32,7 +32,6 @@ public class EstimationMethod {
 
     private class VerletIterator implements Iterator<Time> {
         private double time;
-        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         private final double mass;
@@ -96,7 +95,6 @@ public class EstimationMethod {
 
     private class BeemanIterator implements Iterator<Time> {
         private double time;
-        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         private final double mass;
@@ -170,7 +168,6 @@ public class EstimationMethod {
 
     private class GearIterator implements Iterator<Time> {
         private double time;
-        //private final MovementModel modelCopy;
         private final double deltaT;
         private final double deltaTPow2;
         // Previous values

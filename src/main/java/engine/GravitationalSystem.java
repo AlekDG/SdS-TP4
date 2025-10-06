@@ -113,7 +113,7 @@ public class GravitationalSystem implements MovementModel {
 
     @Override
     public double[][] getForceMatrix(){
-        double[][]forceMatrix = new double[particles.size()][3];
+        double[][] forceMatrix = new double[particles.size()][3];
         for(Particle p : particles){
             forceMatrix[p.getId()] = forceArray(p);
         }
@@ -125,24 +125,51 @@ public class GravitationalSystem implements MovementModel {
         return false;
     }
 
-    // TODO everything below here -> Berni's doing it rn
     @Override
     public double[][] computeR2FromState(double[][] positions, double[][] velocities) {
-        return new double[0][];
+        double[][] R2 = new double[particleCount()][Particle.DIMENSION];
+        for (Particle p : particles) {
+            int id = p.getId();
+            double x = positions[id][0];
+            double y = positions[id][1];
+            double z = positions[id][2];
+            double vx = velocities[id][0];
+            double vy = velocities[id][1];
+            double vz = velocities[id][2];
+
+            Particle particle = new Particle(id, x, y, z, vx, vy, vz, 0);
+
+            // TODO preguntar si debería calcular R2 contra las otras posiciones/velocidades predichas o no
+            double[] forceArray = forceArray(particle);
+
+            R2[id][0] = forceArray[0] / mass;
+            R2[id][1] = forceArray[1] / mass;
+            R2[id][2] = forceArray[2] / mass;
+        }
+        return R2;
     }
+
 
     @Override
     public double[][] getR3Matrix() {
-        return new double[0][];
+        return getEmptyMatrix();
     }
 
     @Override
     public double[][] getR4Matrix() {
-        return new double[0][];
-    }
+        return getEmptyMatrix();    }
 
     @Override
     public double[][] getR5Matrix() {
-        return new double[0][];
+        return getEmptyMatrix();    }
+
+    private double[][] getEmptyMatrix() {
+        double[][] toReturn = new double[particleCount()][Particle.DIMENSION];
+        for (int i = 0; i < particleCount(); i++) {
+            for (int j = 0; j < Particle.DIMENSION; j++) {
+                toReturn[i][j] = 0;
+            }
+        }
+        return toReturn;
     }
 }
