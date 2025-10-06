@@ -90,10 +90,10 @@ public class GravitationalSystem implements MovementModel {
         double dy = p1.getY() - p2.getY();
         double dz = p1.getZ() - p2.getZ();
         double scalar = -G*mass*mass/Math.pow((Math.pow(d12,2)+Math.pow(h,2)),(double)3/2);
-        double v1 = dx*scalar;
-        double v2 = dy*scalar;
-        double v3 = dz*scalar;
-        return new double[]{v1, v2, v3};
+        double fx = dx*scalar;
+        double fy = dy*scalar;
+        double fz = dz*scalar;
+        return new double[]{fx, fy, fz};
     }
 
     private double[] forceArray(Particle p) {
@@ -137,12 +137,29 @@ public class GravitationalSystem implements MovementModel {
 
             Particle particle = new Particle(id, x, y, z, vx, vy, vz, 0);
 
-            // TODO Se debería calcular con las posiciones y velocidades predichas
-            double[] forceArray = forceArray(particle);
+            double[] forces = new double[] {0, 0, 0};
 
-            R2[id][0] = forceArray[0] / mass;
-            R2[id][1] = forceArray[1] / mass;
-            R2[id][2] = forceArray[2] / mass;
+            for (Particle otherPar : particles) {
+                int otherId = otherPar.getId();
+                if (id == otherId)
+                    continue;
+                double otherX = positions[otherId][0];
+                double otherY = positions[otherId][1];
+                double otherZ = positions[otherId][2];
+                double otherVX = velocities[otherId][0];
+                double otherVY = velocities[otherId][1];
+                double otherVZ = velocities[otherId][2];
+
+                Particle otherParticle = new Particle(otherId, otherX, otherY, otherZ, otherVX, otherVY, otherVZ, 0);
+                double[] currentParForce = forceCalculation(particle, otherParticle);
+                forces[0] += currentParForce[0];
+                forces[1] += currentParForce[1];
+                forces[2] += currentParForce[2];
+            }
+
+            R2[id][0] = forces[0] / mass;
+            R2[id][1] = forces[1] / mass;
+            R2[id][2] = forces[2] / mass;
         }
         return R2;
     }
