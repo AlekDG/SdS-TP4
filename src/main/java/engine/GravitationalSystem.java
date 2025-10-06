@@ -63,7 +63,7 @@ public class GravitationalSystem implements MovementModel {
         for(Particle p : particles){
             for(int i = particles.indexOf(p) + 1; i < particleCount; i++){
                 Particle p2 = particles.get(i);
-                totalEnergy += (-G * mass *mass) / p.getDistance(p2);
+                totalEnergy += (-G * mass *mass) / p.getDistance(p2); // TODO falta el h
             }
         }
         return totalEnergy;
@@ -139,7 +139,7 @@ public class GravitationalSystem implements MovementModel {
 
             Particle particle = new Particle(id, x, y, z, vx, vy, vz, 0);
 
-            // TODO preguntar si debería calcular R2 contra las otras posiciones/velocidades predichas o no
+            // TODO Se debería calcular con las posiciones y velocidades predichas
             double[] forceArray = forceArray(particle);
 
             R2[id][0] = forceArray[0] / mass;
