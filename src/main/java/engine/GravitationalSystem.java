@@ -63,7 +63,7 @@ public class GravitationalSystem implements MovementModel {
         for(Particle p : particles){
             for(int i = particles.indexOf(p) + 1; i < particleCount; i++){
                 Particle p2 = particles.get(i);
-                totalEnergy += (-G * mass *mass) / p.getDistance(p2); // TODO falta el h
+                totalEnergy += (-G * mass * mass) / (p.getDistance(p2) + h*h);
             }
         }
         return totalEnergy;
