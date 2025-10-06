@@ -1,5 +1,6 @@
 package engine;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class GravitationalSystem implements MovementModel {
     public double h;
 
     public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G, double h) {
-        this.particles = particles;
+        this.particles = new ArrayList<>(particles);
         this.deltaT = deltaT;
         this.mass = mass;
         this.particleCount = particles.size();
