@@ -69,11 +69,8 @@ public class GravitationalSystem implements MovementModel {
         return totalEnergy;
     }
 
-    // Sorts particles based on how close they are to the center
-    // We're gonna need this for half-mass radius
+    @Override
     public void particleSort(){
-        // Taking square root is computationally expensive and doesn't change order because
-        // if(a<=b) then(sqrt(a)<=sqrt(b))
         particles.sort(Comparator.comparingDouble(
                 p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()
         ));
