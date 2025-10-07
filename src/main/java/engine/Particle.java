@@ -147,5 +147,8 @@ public class Particle {
         return new Particle(id, x, y, z, sx, sy, sz, r, particleType);
     }
 
+    public static void resetGlobalId(){
+        globalId = 0;
+    }
 
 }

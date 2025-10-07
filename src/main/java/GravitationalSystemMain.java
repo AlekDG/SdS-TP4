@@ -24,19 +24,40 @@ public class GravitationalSystemMain {
         double delta_t = 0.01;//Double.parseDouble(System.getProperty(DT));
         double max_t = 10; // Double.parseDouble(System.getProperty(MAX_T));
         String outputFile = System.getProperty(OUTPUT_FILE);
-        int simulation = 2; //0 for deltaT optimization, 1 for rhm ....
+        int simulation = 1; //0 for deltaT optimization, 1 for rhm ....
 
         switch (simulation) {
             case 0 -> optimalDeltaT(n, max_t);
-            case 1 -> rhmSimulation(n, delta_t, max_t);
+            case 1 -> rhmSimulation(delta_t, max_t);
             case 2 -> galaxyCollision(n, delta_t, max_t);
             default -> test(n, delta_t, max_t);
         }
 
     }
 
-    private static void rhmSimulation(int n, double deltaT, double maxT) {
-        throw new RuntimeException("Not implemented yet");
+    private static void rhmSimulation(double deltaT, double maxT) throws IOException {
+        //Para cada valor de N, se realiza la simulacion 10 veces dejando las 10 iteraciones en el mismo archivo
+        int[] particleCounts = {100, 500, 1000, 1500, 2000};
+
+        for(int particleCount : particleCounts){
+            try(PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")){
+                for (int i = 0; i < 10; i++){
+                    postProcessor.writeRhmInitialLine(i);
+                    Particle.resetGlobalId();
+                    List<Particle> particles = new ArrayList<>();
+                    ParticleGenerator.generate(particleCount, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
+                    GravitationalSystem system = new GravitationalSystem(particles, 1, deltaT, 1, 0.1);
+                    EstimationMethod estimationMethod = new EstimationMethod(system, maxT);
+                    Iterator<Time> timeIt = estimationMethod.verletEstimation(); //TODO: usar el mejor estimador del 2.1
+                    GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
+                    timeIt.forEachRemaining(time -> postProcessor.processRhm(time.time(), systemIteratorCopy.halfMassRadius()));
+                }
+            }
+
+        }
+
+
+
     }
 
     private static double errorEstimation(double eT, double e0) {

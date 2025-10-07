@@ -77,6 +77,22 @@ public class PostProcessor implements Closeable {
         }
     }
 
+    public void writeRhmInitialLine(int repetitionCount) {
+        try {
+            writer.write("repetition %d\n".formatted(repetitionCount));
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing on output file", e);
+        }
+    }
+
+    public void processRhm(double time, double rhm)  {
+        try {
+            writer.write("%f , %f\n".formatted(time, rhm));
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing on output file", e);
+        }
+    }
+
     @Override
     public void close() throws IOException {
         writer.close();
