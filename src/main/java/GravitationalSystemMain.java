@@ -9,27 +9,28 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GravitationalSystemMain {
-    private static final String N = "n";
-    private static final String DT = "dt";
+    private static final String N = "N";
+    private static final String DT = "DT";
+    private static final String MAX_T = "MaxT";
+    private static final String SIMULATION = "SIM";
     private static final String OUTPUT_FILE = "OUTPUT_FILE";
-    private static final double SMOOTHING_FACTOR = 10;
 
+    private static final double SMOOTHING_FACTOR = 10;
     private static final double INITIAL_VELOCITY_MODULUS = 0.1;
     private static final double RADIUS = 0;
-    private static final String MAX_T = "max_t";
 
 
     public static void main(String[] args) throws IOException {
-        int n = 200;//Integer.parseInt(System.getProperty(N));
-        double delta_t = 0.01;//Double.parseDouble(System.getProperty(DT));
-        double max_t = 10; // Double.parseDouble(System.getProperty(MAX_T));
+        int n = Integer.parseInt(System.getProperty(N));
+        double delta_t = Double.parseDouble(System.getProperty(DT));
+        double max_t = Double.parseDouble(System.getProperty(MAX_T));
+        int simulation = Integer.parseInt(System.getProperty(SIMULATION));
         String outputFile = System.getProperty(OUTPUT_FILE);
-        int simulation = 1; //0 for deltaT optimization, 1 for rhm ....
 
         switch (simulation) {
-            case 0 -> optimalDeltaT(n, max_t);
-            case 1 -> rhmSimulation(delta_t, max_t);
-            case 2 -> galaxyCollision(n, delta_t, max_t);
+            case 1 -> optimalDeltaT(n, max_t);
+            case 2 -> rhmSimulation(delta_t, max_t);
+            case 3 -> galaxyCollision(n, delta_t, max_t);
             default -> test(n, delta_t, max_t);
         }
 
