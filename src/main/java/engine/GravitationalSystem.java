@@ -19,6 +19,7 @@ public class GravitationalSystem implements MovementModel {
         this.particleCount = particles.size();
         this.G = G;
         this.h = h;
+        particleSort();
     }
 
     @Override
