@@ -54,7 +54,9 @@ public class GravitationalSystemMain {
             Iterator<Time> timeIt = estimationMethod.beemanEstimation();
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
+
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTBeemanEnergy" + deltaT + ".txt")) {
+                postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                 timeIt.forEachRemaining(time -> {
                     double currentEnergy = systemIteratorCopy.systemEnergy();
                     double error = errorEstimation(currentEnergy, initialEnergy);
@@ -72,6 +74,7 @@ public class GravitationalSystemMain {
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy =  system.systemEnergy();
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTVerletEnergy" + deltaT + ".txt")) {
+                postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                 timeIt.forEachRemaining(time -> {
                     double currentEnergy = systemIteratorCopy.systemEnergy();
                     double error = errorEstimation(currentEnergy, initialEnergy);
@@ -90,6 +93,7 @@ public class GravitationalSystemMain {
             double initialEnergy =  system.systemEnergy();
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTGearEnergy" + deltaT + ".txt")) {
                 timeIt.forEachRemaining(time -> {
+                    postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                     double currentEnergy =  systemIteratorCopy.systemEnergy();
                     double error = errorEstimation(currentEnergy, initialEnergy);
                     postProcessorEnergy.processSystemEnergy(time, error);
@@ -115,6 +119,7 @@ public class GravitationalSystemMain {
         try (PostProcessor postProcessor = new PostProcessor("verletGravitational.txt") ;
              PostProcessor postProcessorEnergy = new PostProcessor("energyVerletGravitational.txt");
              PostProcessor animProcessor = new PostProcessor("animVerletGravitational.txt")) {
+            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy1.systemEnergy());
             timeIt.forEachRemaining( time -> {
                 if(i.getAndIncrement()%(1/(SMOOTHING_FACTOR*delta_t))==0){
                     postProcessor.processTime(time);
@@ -132,6 +137,7 @@ public class GravitationalSystemMain {
         try (PostProcessor postProcessor = new PostProcessor("beemanGravitational.txt") ;
              PostProcessor postProcessorEnergy = new PostProcessor("energyBeemanGravitational.txt");
              PostProcessor animProcessor2 = new PostProcessor("animBeemanGravitational.txt")) {
+            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy2.systemEnergy());
             timeIt.forEachRemaining( time -> {
                 if(i.getAndIncrement()%(1/(SMOOTHING_FACTOR*delta_t))==0){
                     postProcessor.processTime(time);
@@ -149,6 +155,7 @@ public class GravitationalSystemMain {
         try (PostProcessor postProcessor = new PostProcessor("gearGravitational.txt") ;
              PostProcessor postProcessorEnergy = new PostProcessor("energyGearGravitational.txt");
              PostProcessor animProcessor3 = new PostProcessor("animGearGravitational.txt")) {
+            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy3.systemEnergy());
             timeIt.forEachRemaining( time -> {
                 if(i.getAndIncrement()%(1/(SMOOTHING_FACTOR*delta_t))==0){
                     postProcessor.processTime(time);
