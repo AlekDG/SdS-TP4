@@ -12,7 +12,7 @@ public class GravitationalSystemMain {
     private static final String N = "n";
     private static final String DT = "dt";
     private static final String OUTPUT_FILE = "OUTPUT_FILE";
-    private static final double SMOOTHING_FACTOR = 5;
+    private static final double SMOOTHING_FACTOR = 10;
 
     private static final double INITIAL_VELOCITY_MODULUS = 0.1;
     private static final double RADIUS = 0;
@@ -65,9 +65,10 @@ public class GravitationalSystemMain {
     }
 
     private static void optimalDeltaT(int n, double max_t) throws IOException {
-        double[] deltaTs = {1, 0.1, 0.05, 0.01, 0.001, 0.0001};
+        double[] deltaTs = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
         List<Particle> particles = new ArrayList<>();
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
+        AtomicInteger i = new AtomicInteger(0);
         //Beeman
         for (double deltaT : deltaTs) {
             System.out.println("Starting Beeman simulation with " + n + " particles, delta_t = " + deltaT + ", max_t = " + max_t);
@@ -76,16 +77,18 @@ public class GravitationalSystemMain {
             Iterator<Time> timeIt = estimationMethod.beemanEstimation();
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
-
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTBeemanEnergy" + deltaT + ".txt")) {
                 postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                 timeIt.forEachRemaining(time -> {
-                    double currentEnergy = systemIteratorCopy.systemEnergy();
-                    double error = errorEstimation(currentEnergy, initialEnergy);
-                    postProcessorEnergy.processSystemEnergy(time, error);
+                    if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
+                        double currentEnergy = systemIteratorCopy.systemEnergy();
+                        double error = errorEstimation(currentEnergy, initialEnergy);
+                        postProcessorEnergy.processSystemEnergy(time, error);
+                    }
                 });
             }
         }
+        i.set(0);
 
         //Verlet
         for (double deltaT : deltaTs) {
@@ -98,12 +101,15 @@ public class GravitationalSystemMain {
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTVerletEnergy" + deltaT + ".txt")) {
                 postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                 timeIt.forEachRemaining(time -> {
-                    double currentEnergy = systemIteratorCopy.systemEnergy();
-                    double error = errorEstimation(currentEnergy, initialEnergy);
-                    postProcessorEnergy.processSystemEnergy(time, error);
+                    if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
+                        double currentEnergy = systemIteratorCopy.systemEnergy();
+                        double error = errorEstimation(currentEnergy, initialEnergy);
+                        postProcessorEnergy.processSystemEnergy(time, error);
+                    }
                 });
             }
         }
+        i.set(0);
 
         //Gear
         for (double deltaT : deltaTs) {
@@ -115,10 +121,12 @@ public class GravitationalSystemMain {
             double initialEnergy = system.systemEnergy();
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTGearEnergy" + deltaT + ".txt")) {
                 timeIt.forEachRemaining(time -> {
-                    postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
-                    double currentEnergy = systemIteratorCopy.systemEnergy();
-                    double error = errorEstimation(currentEnergy, initialEnergy);
-                    postProcessorEnergy.processSystemEnergy(time, error);
+                    if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
+                        postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
+                        double currentEnergy = systemIteratorCopy.systemEnergy();
+                        double error = errorEstimation(currentEnergy, initialEnergy);
+                        postProcessorEnergy.processSystemEnergy(time, error);
+                    }
                 });
             }
         }
