@@ -21,7 +21,7 @@ public class GravitationalSystemMain {
 
     public static void main(String[] args) throws IOException {
         int n = 200;//Integer.parseInt(System.getProperty(N));
-        double delta_t = 0.001;//Double.parseDouble(System.getProperty(DT));
+        double delta_t = 0.01;//Double.parseDouble(System.getProperty(DT));
         double max_t = 10; // Double.parseDouble(System.getProperty(MAX_T));
         String outputFile = System.getProperty(OUTPUT_FILE);
         int simulation = 2; //0 for deltaT optimization, 1 for rhm ....
@@ -44,7 +44,7 @@ public class GravitationalSystemMain {
     }
 
     private static void optimalDeltaT(int n, double max_t) throws IOException {
-        double[] deltaTs = {10, 5, 1, 0.1, 0.05, 0.01};
+        double[] deltaTs = {1, 0.1, 0.05, 0.01, 0.001, 0.0001};
         List<Particle> particles = new ArrayList<>();
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
         //Beeman
@@ -113,7 +113,13 @@ public class GravitationalSystemMain {
         Iterator<Time> iterator = estimationMethod.verletEstimation();
         try( PostProcessor postProcessor = new PostProcessor("galaxyColissionAnimation.txt")){
             postProcessor.processTimeAnim(new Time(0 , galaxyParticles));
-            iterator.forEachRemaining(postProcessor::processTimeAnim);
+            AtomicInteger i = new AtomicInteger(0);
+            iterator.forEachRemaining(time -> {
+                if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
+                    postProcessor.processTimeAnim(time);
+                }
+
+            });
         }
 
     }

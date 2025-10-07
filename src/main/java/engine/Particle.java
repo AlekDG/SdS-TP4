@@ -9,12 +9,23 @@ public class Particle {
     private double x, y, z;
     private double sx, sy, sz;
     private final double r;
+    private String particleType  = "P";
     private static final int X = 0;
     private static final int Y = 1;
     private static final int Z = 2;
 
     public Particle(double x, double y, double z, double speedx, double speedy, double speedz, double radius) {
         this(globalId++, x, y, z, speedx, speedy, speedz, radius);
+    }
+
+    public Particle(double x, double y, double z, double speedx, double speedy, double speedz, double radius, String type) {
+        this(globalId++, x, y, z, speedx, speedy, speedz, radius);
+        this.particleType = type;
+    }
+
+    public Particle(int id ,double x, double y, double z, double speedx, double speedy, double speedz, double radius, String type) {
+        this(id, x, y, z, speedx, speedy, speedz, radius);
+        this.particleType = type;
     }
 
     Particle(int id, double x, double y, double z, double speedx, double speedy, double speedz, double radius) {
@@ -95,8 +106,8 @@ public class Particle {
     }
     public String extXyzLine() {
         // species then pos (x y z) then vel (sx sy sz)
-        return String.format(Locale.US, "P %.8f %.8f %.8f %.8f %.8f %.8f",
-                x, y, z, sx, sy, sz);
+        return String.format(Locale.US, "%s %.8f %.8f %.8f %.8f %.8f %.8f",
+                particleType,x, y, z, sx, sy, sz);
     }
 
     public int getId() {
@@ -133,7 +144,7 @@ public class Particle {
     }
 
     public Particle hardCopy() {
-        return new Particle(id, x, y, z, sx, sy, sz, r);
+        return new Particle(id, x, y, z, sx, sy, sz, r, particleType);
     }
 
 

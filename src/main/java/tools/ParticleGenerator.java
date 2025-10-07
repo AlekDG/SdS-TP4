@@ -42,7 +42,7 @@ public class ParticleGenerator {
         for (Particle p : firstGalaxyParticles) {
             particles.add(p);
             Particle opposite = new Particle(p.getX() + DELTAX, p.getY() + DELTAY, p.getZ(),
-                    p.getSpeedX() + 0.1, p.getSpeedY(), p.getSpeedZ(), 0);
+                    p.getSpeedX() + 0.1, p.getSpeedY(), p.getSpeedZ(), 0, "P2");
             particles.add(opposite);
             p.setSpeedX(p.getSpeedX() - 0.1);
         }
