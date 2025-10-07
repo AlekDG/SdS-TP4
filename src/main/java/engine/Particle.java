@@ -28,8 +28,21 @@ public class Particle {
         this.r = radius;
     }
 
+    public void setSpeedX(double sx) {
+        this.sx = sx;
+    }
+
+
+    public double getSpeedX() {
+        return sx;
+    }
+
     public double getSpeedY() {
         return sy;
+    }
+
+    public double getSpeedZ() {
+        return sz;
     }
 
     public double getSpeedAbs(){

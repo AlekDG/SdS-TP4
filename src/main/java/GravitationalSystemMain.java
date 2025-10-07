@@ -22,13 +22,14 @@ public class GravitationalSystemMain {
     public static void main(String[] args) throws IOException {
         int n = 200;//Integer.parseInt(System.getProperty(N));
         double delta_t = 0.001;//Double.parseDouble(System.getProperty(DT));
-        double max_t = 100; // Double.parseDouble(System.getProperty(MAX_T));
+        double max_t = 10; // Double.parseDouble(System.getProperty(MAX_T));
         String outputFile = System.getProperty(OUTPUT_FILE);
         int simulation = 2; //0 for deltaT optimization, 1 for rhm ....
 
         switch (simulation) {
             case 0 -> optimalDeltaT(n, max_t);
             case 1 -> rhmSimulation(n, delta_t, max_t);
+            case 2 -> galaxyCollision(n, delta_t, max_t);
             default -> test(n, delta_t, max_t);
         }
 
@@ -101,6 +102,19 @@ public class GravitationalSystemMain {
             }
         }
 
+
+    }
+
+    private static void galaxyCollision(int n, double delta_t, double max_t) throws IOException {
+        List<Particle> galaxyParticles = ParticleGenerator.generateColisionGalaxys(n);
+        GravitationalSystem system = new GravitationalSystem(galaxyParticles, 1, delta_t, 1, 0.1);
+        EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+        //TODO: elegir el mejor estimador para el sistema basandonos en el ej 2.1
+        Iterator<Time> iterator = estimationMethod.verletEstimation();
+        try( PostProcessor postProcessor = new PostProcessor("galaxyColissionAnimation.txt")){
+            postProcessor.processTimeAnim(new Time(0 , galaxyParticles));
+            iterator.forEachRemaining(postProcessor::processTimeAnim);
+        }
 
     }
 
