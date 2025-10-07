@@ -28,16 +28,8 @@ public class Particle {
         this.r = radius;
     }
 
-    public double getSpeedX() {
-        return sx;
-    }
-
     public double getSpeedY() {
         return sy;
-    }
-
-    public double getSpeedZ() {
-        return sz;
     }
 
     public double getSpeedAbs(){
@@ -52,12 +44,12 @@ public class Particle {
     }
 
     public void setPositionAndSpeedPair(PosSpeedPair[] posAndSpeedPair) {
-        x = posAndSpeedPair[0].getPos();
-        sx = posAndSpeedPair[0].getSpeed();
-        y = posAndSpeedPair[1].getPos();
-        sy = posAndSpeedPair[1].getSpeed();
-        z = posAndSpeedPair[2].getPos();
-        sz = posAndSpeedPair[2].getSpeed();
+        x = posAndSpeedPair[0].pos();
+        sx = posAndSpeedPair[0].speed();
+        y = posAndSpeedPair[1].pos();
+        sy = posAndSpeedPair[1].speed();
+        z = posAndSpeedPair[2].pos();
+        sz = posAndSpeedPair[2].speed();
     }
 
     public double getX() {
@@ -78,10 +70,6 @@ public class Particle {
 
     public double getDistance(Particle p) {
         return Math.sqrt(Math.pow(x-p.x,2) + Math.pow(y-p.y,2) + Math.pow(z-p.z,2));
-    }
-
-    public double getRadius() {
-        return r;
     }
 
     @Override
@@ -128,21 +116,7 @@ public class Particle {
         }
     }
 
-    public static class PosSpeedPair {
-        private final double pos;
-        private final double speed;
-        public PosSpeedPair(double pos, double speed) {
-            this.pos = pos;
-            this.speed = speed;
-        }
-
-        public double getPos() {
-            return pos;
-        }
-
-        public double getSpeed() {
-            return speed;
-        }
+    public record PosSpeedPair(double pos, double speed) {
     }
 
     public Particle hardCopy() {
