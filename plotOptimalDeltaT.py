@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Parámetros
-delta_ts = [0.1, 0.05, 0.01, 0.005, 0.001]
-integradores = ['Beeman']
+delta_ts = [10.0, 5.0, 1.0, 0.1, 0.05, 0.01]
+integradores = ['Gear','Beeman', 'Verlet']
 
 # Loop sobre integradores
 for integrador in integradores:
