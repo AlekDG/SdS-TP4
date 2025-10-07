@@ -39,7 +39,7 @@ public class GravitationalSystemMain {
     private static void rhmSimulation(double deltaT, double maxT) throws IOException {
         //Para cada valor de N, se realiza la simulacion 10 veces dejando las 10 iteraciones en el mismo archivo
         int[] particleCounts = {100, 500, 1000, 1500, 2000};
-
+        AtomicInteger j = new AtomicInteger(0);
         for(int particleCount : particleCounts){
             try(PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")){
                 for (int i = 0; i < 10; i++){
@@ -51,7 +51,13 @@ public class GravitationalSystemMain {
                     EstimationMethod estimationMethod = new EstimationMethod(system, maxT);
                     Iterator<Time> timeIt = estimationMethod.verletEstimation(); //TODO: usar el mejor estimador del 2.1
                     GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
-                    timeIt.forEachRemaining(time -> postProcessor.processRhm(time.time(), systemIteratorCopy.halfMassRadius()));
+                    timeIt.forEachRemaining(time -> {
+                        if (j.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
+                            postProcessor.processRhm(time.time(), systemIteratorCopy.halfMassRadius());
+                        }
+
+
+                    });
                 }
             }
 
