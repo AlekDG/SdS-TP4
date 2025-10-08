@@ -11,6 +11,7 @@ public class GravitationalSystem implements MovementModel {
     private final int particleCount;
     private final double G;
     public double h;
+    private final double GM2;
 
     public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G, double h) {
         this.particles = new ArrayList<>(particles);
@@ -19,6 +20,7 @@ public class GravitationalSystem implements MovementModel {
         this.particleCount = particles.size();
         this.G = G;
         this.h = h;
+        this.GM2 = this.mass * this.mass * this.G;
         particleSort();
     }
 
@@ -85,16 +87,18 @@ public class GravitationalSystem implements MovementModel {
         return hmr;
     }
 
-    private double[] forceCalculation(Particle p1, Particle p2){
-        double d12 = p1.getDistance(p2);
-        double dx = p1.getX() - p2.getX();
-        double dy = p1.getY() - p2.getY();
-        double dz = p1.getZ() - p2.getZ();
-        double scalar = -G*mass*mass/Math.pow((Math.pow(d12,2)+Math.pow(h,2)),(double)3/2);
-        double fx = dx*scalar;
-        double fy = dy*scalar;
-        double fz = dz*scalar;
-        return new double[]{fx, fy, fz};
+    private double[] forceCalculation(Particle p1, Particle p2) {
+        final double dx = p1.getX() - p2.getX();
+        final double dy = p1.getY() - p2.getY();
+        final double dz = p1.getZ() - p2.getZ();
+
+        final double r2 = dx*dx + dy*dy + dz*dz;
+        final double denom = r2 + h*h;
+        final double invDist = 1.0 / Math.sqrt(denom);
+        final double invDist3 = invDist * invDist * invDist;
+        final double scalar = -GM2 * invDist3;
+
+        return new double[] { dx * scalar, dy * scalar, dz * scalar };
     }
 
     private double[] forceArray(Particle p) {
