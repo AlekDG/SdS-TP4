@@ -7,15 +7,13 @@ import java.util.List;
 public class GravitationalSystem implements MovementModel {
     private final List<Particle> particles;
     private final double mass;
-    private final double deltaT;
     private final int particleCount;
     private final double G;
     private final double h;
     private final double GM2;
 
-    public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G, double h) {
+    public GravitationalSystem(List<Particle> particles, double mass, double G, double h) {
         this.particles = new ArrayList<>(particles);
-        this.deltaT = deltaT;
         this.mass = mass;
         this.particleCount = particles.size();
         this.G = G;
@@ -34,11 +32,6 @@ public class GravitationalSystem implements MovementModel {
     }
 
     @Override
-    public double deltaT() {
-        return deltaT;
-    }
-
-    @Override
     public int particleCount() {
         return particleCount;
     }
@@ -46,7 +39,7 @@ public class GravitationalSystem implements MovementModel {
     @Override
     public MovementModel hardCopyModel() {
         List<Particle> newParticles = particles.stream().map(Particle::hardCopy).toList();
-        return new GravitationalSystem(newParticles, mass, deltaT, G, h);
+        return new GravitationalSystem(newParticles, mass, G, h);
     }
 
     public double systemEnergy(){

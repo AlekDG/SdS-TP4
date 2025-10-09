@@ -9,20 +9,18 @@ public class DampedOscillator implements MovementModel {
     private final double gamma;
     private final double mass;
     private final Particle particle;
-    private final double deltaT;
 
-    public DampedOscillator(double K, double gamma, double A, double mass, double deltaT) {
+    public DampedOscillator(double K, double gamma, double A, double mass) {
         this(
-                K, gamma, mass, deltaT,
+                K, gamma, mass,
                 new Particle(0, A, 0, 0, -A*gamma/(2*mass), 0, 0)
         );
     }
 
-    private DampedOscillator(double K, double gamma, double mass, double deltaT, Particle particle) {
+    private DampedOscillator(double K, double gamma, double mass, Particle particle) {
         this.K = K;
         this.gamma = gamma;
         this.mass = mass;
-        this.deltaT = deltaT;
         this.particle = particle;
     }
 
@@ -50,11 +48,6 @@ public class DampedOscillator implements MovementModel {
     @Override
     public List<Particle> particles() {
         return List.of(particle);
-    }
-
-    @Override
-    public double deltaT() {
-        return deltaT;
     }
 
     @Override
@@ -109,6 +102,6 @@ public class DampedOscillator implements MovementModel {
 
     @Override
     public MovementModel hardCopyModel() {
-        return new DampedOscillator(K, gamma, mass, deltaT, particle.hardCopy());
+        return new DampedOscillator(K, gamma, mass, particle.hardCopy());
     }
 }

@@ -8,8 +8,6 @@ public interface MovementModel {
 
     List<Particle> particles();
 
-    double deltaT();
-
     MovementModel hardCopyModel();
 
     boolean isForceFunctionSpeedDependant();

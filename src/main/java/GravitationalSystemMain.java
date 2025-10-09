@@ -47,8 +47,8 @@ public class GravitationalSystemMain {
                     Particle.resetGlobalId();
                     List<Particle> particles = new ArrayList<>();
                     ParticleGenerator.generate(particleCount, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
-                    GravitationalSystem system = new GravitationalSystem(particles, 1, deltaT, 1, 0.1);
-                    EstimationMethod estimationMethod = new EstimationMethod(system, maxT);
+                    GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
+                    EstimationMethod estimationMethod = new EstimationMethod(system, deltaT, maxT);
                     Iterator<Time> timeIt = estimationMethod.verletEstimation(); //TODO: usar el mejor estimador del 2.1
                     GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
                     timeIt.forEachRemaining(time -> {
@@ -73,8 +73,8 @@ public class GravitationalSystemMain {
         //Beeman
         for (double deltaT : deltaTs) {
             System.out.println("Starting Beeman simulation with " + n + " particles, delta_t = " + deltaT + ", max_t = " + max_t);
-            GravitationalSystem system = new GravitationalSystem(particles, 1, deltaT, 1, 0.1);
-            EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+            GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
+            EstimationMethod estimationMethod = new EstimationMethod(system, deltaT, max_t);
             Iterator<Time> timeIt = estimationMethod.beemanEstimation();
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
@@ -94,8 +94,8 @@ public class GravitationalSystemMain {
         //Verlet
         for (double deltaT : deltaTs) {
             System.out.println("Starting Verlet simulation with " + n + " particles, delta_t = " + deltaT + ", max_t = " + max_t);
-            GravitationalSystem system = new GravitationalSystem(particles, 1, deltaT, 1, 0.1);
-            EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+            GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
+            EstimationMethod estimationMethod = new EstimationMethod(system, deltaT, max_t);
             Iterator<Time> timeIt = estimationMethod.verletEstimation();
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
@@ -115,8 +115,8 @@ public class GravitationalSystemMain {
         //Gear
         for (double deltaT : deltaTs) {
             System.out.println("Starting Gear simulation with " + n + " particles, delta_t = " + deltaT + ", max_t = " + max_t);
-            GravitationalSystem system = new GravitationalSystem(particles, 1, deltaT, 1, 0.1);
-            EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+            GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
+            EstimationMethod estimationMethod = new EstimationMethod(system, deltaT, max_t);
             Iterator<Time> timeIt = estimationMethod.gearEstimation();
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
@@ -137,8 +137,8 @@ public class GravitationalSystemMain {
 
     private static void galaxyCollision(int n, double delta_t, double max_t) throws IOException {
         List<Particle> galaxyParticles = ParticleGenerator.generateColisionGalaxys(n);
-        GravitationalSystem system = new GravitationalSystem(galaxyParticles, 1, delta_t, 1, 0.1);
-        EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+        GravitationalSystem system = new GravitationalSystem(galaxyParticles, 1, 1, 0.1);
+        EstimationMethod estimationMethod = new EstimationMethod(system, delta_t, max_t);
         //TODO: elegir el mejor estimador para el sistema basandonos en el ej 2.1
         Iterator<Time> iterator = estimationMethod.verletEstimation();
         try( PostProcessor postProcessor = new PostProcessor("galaxyColissionAnimation.txt")){
@@ -157,8 +157,8 @@ public class GravitationalSystemMain {
     private static void test(int n, double delta_t, double max_t) throws IOException {
         List<Particle> particles = new ArrayList<>();
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
-        GravitationalSystem system = new GravitationalSystem(particles, 1, delta_t, 1, 0.1);
-        EstimationMethod estimationMethod = new EstimationMethod(system, max_t);
+        GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
+        EstimationMethod estimationMethod = new EstimationMethod(system, delta_t, max_t);
 
         System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Verlet method.");
         System.out.println("System energy before: " + system.systemEnergy());

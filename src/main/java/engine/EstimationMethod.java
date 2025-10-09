@@ -8,10 +8,14 @@ public class EstimationMethod {
     private final MovementModel model;
     private MovementModel currentModelCopy;
     private final double endTime;
+    private final double deltaT;
+    private final double deltaTPow2;
 
-    public EstimationMethod(MovementModel model, double endTime) {
+    public EstimationMethod(MovementModel model, double deltaT, double endTime) {
         this.model = model;
         this.endTime = endTime;
+        this.deltaT = deltaT;
+        this.deltaTPow2 = deltaT * deltaT;
     }
 
     public Iterator<Time> verletEstimation() {
@@ -32,16 +36,12 @@ public class EstimationMethod {
 
     private class VerletIterator implements Iterator<Time> {
         private double time;
-        private final double deltaT;
-        private final double deltaTPow2;
         private final double mass;
         private double[][] prevPos;
 
         public VerletIterator() {
             time = 0;
             currentModelCopy = model.hardCopyModel();
-            deltaT = currentModelCopy.deltaT();
-            deltaTPow2 = Math.pow(deltaT, 2);
             mass = currentModelCopy.mass();
             prevPos = new double[currentModelCopy.particleCount()][Particle.DIMENSION];
             double[][] forceMatrix = currentModelCopy.getForceMatrix();
@@ -95,8 +95,6 @@ public class EstimationMethod {
 
     private class BeemanIterator implements Iterator<Time> {
         private double time;
-        private final double deltaT;
-        private final double deltaTPow2;
         private final double mass;
         private final Particle.PosSpeedPair[][] prevPosAndSpeed;
         private double[][] prevForceMatrix;
@@ -104,8 +102,6 @@ public class EstimationMethod {
         public BeemanIterator() {
             time = 0;
             currentModelCopy = model.hardCopyModel();
-            deltaT = currentModelCopy.deltaT();
-            deltaTPow2 = Math.pow(deltaT, 2);
             mass = currentModelCopy.mass();
             prevPosAndSpeed = new Particle.PosSpeedPair[currentModelCopy.particleCount()][Particle.DIMENSION];
             prevForceMatrix = currentModelCopy.getForceMatrix();
@@ -168,8 +164,6 @@ public class EstimationMethod {
 
     private class GearIterator implements Iterator<Time> {
         private double time;
-        private final double deltaT;
-        private final double deltaTPow2;
         // Previous values
         private final double[][][] prevGears;
         private final static int COEFFICIENT_AMOUNT = 6;
@@ -194,8 +188,6 @@ public class EstimationMethod {
             r4Pred = new double[N][DIM];
             r5Pred = new double[N][DIM];
 
-            deltaT = currentModelCopy.deltaT();
-            deltaTPow2 = Math.pow(deltaT, 2);
             // for each particle and axis, I store it's previous coefficients
             prevGears = new double[currentModelCopy.particles().size()][Particle.DIMENSION][COEFFICIENT_AMOUNT];
             double[][] R2Matrix = currentModelCopy.getR2Matrix();

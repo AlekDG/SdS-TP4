@@ -8,8 +8,9 @@ import java.io.IOException;
 import java.util.Iterator;
 public class DampedOscillatorMain {
     public static void main(String[] args) throws IOException {
-        MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70, Math.pow(10, -2));
-        EstimationMethod estimationMethod = new EstimationMethod(model, 5);
+        double deltaT = Math.pow(10, -2);
+        MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70);
+        EstimationMethod estimationMethod = new EstimationMethod(model, deltaT, 5);
         Iterator<Time> timeIt;
         timeIt = estimationMethod.verletEstimation();
         try (PostProcessor postProcessor = new PostProcessor("verlet.txt")) {
