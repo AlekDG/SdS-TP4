@@ -6,7 +6,7 @@ import tools.PostProcessor;
 
 import java.io.IOException;
 import java.util.Iterator;
-public class Main{
+public class DampedOscillatorMain {
     public static void main(String[] args) throws IOException {
         MovementModel model = new DampedOscillator(Math.pow(10, 4), 100, 1, 70, Math.pow(10, -2));
         EstimationMethod estimationMethod = new EstimationMethod(model, 5);
