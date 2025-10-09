@@ -55,7 +55,7 @@ public class GravitationalSystem implements MovementModel {
     }
 
     private double potentialEnergy(){
-        double totalEnergy = 0;
+        double halfEnergy = 0;
         for(Particle p : particles){
             for(int i = particles.indexOf(p) + 1; i < particleCount; i++){
                 Particle p2 = particles.get(i);
@@ -63,10 +63,10 @@ public class GravitationalSystem implements MovementModel {
                 double dy = p.getY() - p2.getY();
                 double dz = p.getZ() - p2.getZ();
                 double r2 = dx*dx + dy*dy + dz*dz;
-                totalEnergy += (-GM2) / Math.sqrt(r2 + h*h);
+                halfEnergy += (-GM2) / Math.sqrt(r2 + h*h);
             }
         }
-        return totalEnergy;
+        return halfEnergy*2;
     }
 
     private void particleSort(){
