@@ -40,9 +40,9 @@ public class GravitationalSystemMain {
         //Para cada valor de N, se realiza la simulacion 10 veces dejando las 10 iteraciones en el mismo archivo
         int[] particleCounts = {100, 500, 1000, 1500, 2000};
         AtomicInteger j = new AtomicInteger(0);
-        for(int particleCount : particleCounts){
-            try(PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")){
-                for (int i = 0; i < 10; i++){
+        for (int particleCount : particleCounts) {
+            try (PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")) {
+                for (int i = 0; i < 10; i++) {
                     postProcessor.writeRhmInitialLine(i);
                     Particle.resetGlobalId();
                     List<Particle> particles = new ArrayList<>();
@@ -66,7 +66,7 @@ public class GravitationalSystemMain {
     }
 
     private static void optimalDeltaT(int n, double max_t) throws IOException {
-        double[] deltaTs = {0.0001};
+        double[] deltaTs = {1, 0.1, 0.01, 0.001, 0.0001};
         List<Particle> particles = new ArrayList<>();
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
         AtomicInteger i = new AtomicInteger(0);
@@ -121,8 +121,8 @@ public class GravitationalSystemMain {
             GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
             double initialEnergy = system.systemEnergy();
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTGearEnergy" + deltaT + ".txt")) {
+                postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                 timeIt.forEachRemaining(time -> {
-                    postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                     if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
                         double currentEnergy = systemIteratorCopy.systemEnergy();
                         double error = errorEstimation(currentEnergy, initialEnergy);
@@ -141,8 +141,8 @@ public class GravitationalSystemMain {
         EstimationMethod estimationMethod = new EstimationMethod(system, delta_t, max_t);
         //TODO: elegir el mejor estimador para el sistema basandonos en el ej 2.1
         Iterator<Time> iterator = estimationMethod.verletEstimation();
-        try( PostProcessor postProcessor = new PostProcessor("galaxyColissionAnimation.txt")){
-            postProcessor.processTimeAnim(new Time(0 , galaxyParticles));
+        try (PostProcessor postProcessor = new PostProcessor("galaxyColissionAnimation.txt")) {
+            postProcessor.processTimeAnim(new Time(0, galaxyParticles));
             AtomicInteger i = new AtomicInteger(0);
             iterator.forEachRemaining(time -> {
                 if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
