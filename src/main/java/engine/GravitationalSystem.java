@@ -10,7 +10,7 @@ public class GravitationalSystem implements MovementModel {
     private final double deltaT;
     private final int particleCount;
     private final double G;
-    public double h;
+    private final double h;
     private final double GM2;
 
     public GravitationalSystem(List<Particle> particles, double mass, double deltaT, double G, double h) {
