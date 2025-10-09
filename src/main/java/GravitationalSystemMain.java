@@ -55,16 +55,10 @@ public class GravitationalSystemMain {
                         if (j.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
                             postProcessor.processRhm(time.time(), systemIteratorCopy.halfMassRadius());
                         }
-
-
                     });
                 }
             }
-
         }
-
-
-
     }
 
     private static double errorEstimation(double eT, double e0) {

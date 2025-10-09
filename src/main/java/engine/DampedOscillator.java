@@ -108,9 +108,6 @@ public class DampedOscillator implements MovementModel {
     }
 
     @Override
-    public void particleSort() {}
-
-    @Override
     public MovementModel hardCopyModel() {
         return new DampedOscillator(K, gamma, mass, deltaT, particle.hardCopy());
     }

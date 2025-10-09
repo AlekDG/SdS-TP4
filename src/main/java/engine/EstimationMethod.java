@@ -89,7 +89,6 @@ public class EstimationMethod {
                     .map(double[]::clone)
                     .toArray(double[][]::new);
             time += deltaT;
-            currentModelCopy.particleSort();
             return new Time(time, currentModelCopy.particles());
         }
     }
@@ -162,7 +161,6 @@ public class EstimationMethod {
                 p.setPositionAndSpeedPair(newPosAndSpeed);
             }
             time += deltaT;
-            currentModelCopy.particleSort();
             prevForceMatrix = forceMatrix;
             return new Time(time, currentModelCopy.particles());
         }
@@ -277,7 +275,6 @@ public class EstimationMethod {
             }
 
             time += deltaT;
-            currentModelCopy.particleSort();
             return new Time(time, currentModelCopy.particles());
         }
 

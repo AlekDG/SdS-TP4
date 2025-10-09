@@ -35,6 +35,4 @@ public interface MovementModel {
     double[][] getR4Matrix();
 
     double[][] getR5Matrix();
-
-    void particleSort();
 }

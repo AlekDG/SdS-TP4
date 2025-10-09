@@ -57,7 +57,7 @@ public class Particle {
     }
 
     public double getSpeedAbs(){
-        return Math.sqrt(sx*sx + sy*sy + sz*sz);
+        return sx*sx + sy*sy + sz*sz;
     }
 
     public PosSpeedPair[] getPositionAndSpeedPair() { return new PosSpeedPair[] {
@@ -89,11 +89,7 @@ public class Particle {
     }
 
     public double getDistanceAbs(){
-        return Math.sqrt(sx*sx + sy*sy + sz*sz);
-    }
-
-    public double getDistance(Particle p) {
-        return Math.sqrt(Math.pow(x-p.x,2) + Math.pow(y-p.y,2) + Math.pow(z-p.z,2));
+        return Math.sqrt(x*x + y*y + z*z);
     }
 
     @Override

@@ -21,7 +21,6 @@ public class GravitationalSystem implements MovementModel {
         this.G = G;
         this.h = h;
         this.GM2 = this.mass * this.mass * this.G;
-        particleSort();
     }
 
     @Override
@@ -57,7 +56,7 @@ public class GravitationalSystem implements MovementModel {
     private double kineticEnergy(){
         double totalEnergy=0;
         for(Particle p : particles){
-            totalEnergy += Math.pow(p.getSpeedAbs(), 2) * (mass / 2);
+            totalEnergy += p.getSpeedAbs() * (mass / 2);
         }
         return totalEnergy;
     }
@@ -67,20 +66,24 @@ public class GravitationalSystem implements MovementModel {
         for(Particle p : particles){
             for(int i = particles.indexOf(p) + 1; i < particleCount; i++){
                 Particle p2 = particles.get(i);
-                totalEnergy += (-G * mass * mass) / (p.getDistance(p2) + h*h);
+                double dx = p.getX() - p2.getX();
+                double dy = p.getY() - p2.getY();
+                double dz = p.getZ() - p2.getZ();
+                double r2 = dx*dx + dy*dy + dz*dz;
+                totalEnergy += (-GM2) / Math.sqrt(r2 + h*h);
             }
         }
         return totalEnergy;
     }
 
-    @Override
-    public void particleSort(){
+    private void particleSort(){
         particles.sort(Comparator.comparingDouble(
                 p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()
         ));
     }
 
     public double halfMassRadius(){
+        particleSort();
         double hmr;
         Particle midParticle = particles.get(particleCount / 2);
         hmr = midParticle.getDistanceAbs();
