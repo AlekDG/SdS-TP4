@@ -66,7 +66,7 @@ public class GravitationalSystemMain {
     }
 
     private static void optimalDeltaT(int n, double max_t) throws IOException {
-        double[] deltaTs = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
+        double[] deltaTs = {0.0001};
         List<Particle> particles = new ArrayList<>();
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
         AtomicInteger i = new AtomicInteger(0);
@@ -122,8 +122,8 @@ public class GravitationalSystemMain {
             double initialEnergy = system.systemEnergy();
             try (PostProcessor postProcessorEnergy = new PostProcessor("optimalDeltaTGearEnergy" + deltaT + ".txt")) {
                 timeIt.forEachRemaining(time -> {
+                    postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                     if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
-                        postProcessorEnergy.processSystemEnergy(new Time(0, particles), initialEnergy);
                         double currentEnergy = systemIteratorCopy.systemEnergy();
                         double error = errorEstimation(currentEnergy, initialEnergy);
                         postProcessorEnergy.processSystemEnergy(time, error);
