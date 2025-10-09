@@ -1,7 +1,7 @@
 package engine;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 
 public class GravitationalSystem implements MovementModel {
@@ -69,18 +69,27 @@ public class GravitationalSystem implements MovementModel {
         return halfEnergy*2;
     }
 
-    private void particleSort(){
-        particles.sort(Comparator.comparingDouble(
-                p -> p.getX() * p.getX() + p.getY() * p.getY() + p.getZ() * p.getZ()
-        ));
-    }
-
     public double halfMassRadius(){
-        particleSort();
-        double hmr;
-        Particle midParticle = particles.get(particleCount / 2);
-        hmr = midParticle.getDistanceAbs();
-        return hmr;
+        //All particles have the same mass so the center of mass is the average of every particle's coordinates
+        double cx = 0, cy = 0, cz = 0;
+        for(Particle p : particles){
+            cx += p.getX();
+            cy += p.getY();
+            cz += p.getZ();
+        }
+        cx /= particleCount;
+        cy /= particleCount;
+        cz /= particleCount;
+
+        double[] squareDistances = new double[particleCount];
+        for(Particle p : particles){
+            double dx = p.getX() - cx;
+            double dy = p.getY() - cy;
+            double dz = p.getZ() - cz;
+            squareDistances[p.getId()] = dx * dx + dy * dy + dz * dz;
+        }
+        Arrays.sort(squareDistances);
+        return Math.sqrt(squareDistances[particleCount/2 - 1]);
     }
 
     private double[] forceCalculation(Particle p1, Particle p2) {

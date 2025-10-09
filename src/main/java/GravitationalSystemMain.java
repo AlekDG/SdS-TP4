@@ -49,7 +49,7 @@ public class GravitationalSystemMain {
                     ParticleGenerator.generate(particleCount, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
                     GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
                     EstimationMethod estimationMethod = new EstimationMethod(system, deltaT, maxT);
-                    Iterator<Time> timeIt = estimationMethod.verletEstimation(); //TODO: usar el mejor estimador del 2.1
+                    Iterator<Time> timeIt = estimationMethod.gearEstimation();
                     GravitationalSystem systemIteratorCopy = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
                     timeIt.forEachRemaining(time -> {
                         if (j.getAndIncrement() % (1 / (SMOOTHING_FACTOR * deltaT)) == 0) {
