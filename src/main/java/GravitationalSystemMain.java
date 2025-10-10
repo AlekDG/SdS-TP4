@@ -13,7 +13,6 @@ public class GravitationalSystemMain {
     private static final String DT = "DT";
     private static final String MAX_T = "MaxT";
     private static final String SIMULATION = "SIM";
-    private static final String OUTPUT_FILE = "OUTPUT_FILE";
 
     private static final double SMOOTHING_FACTOR = 10;
     private static final double INITIAL_VELOCITY_MODULUS = 0.1;
@@ -25,7 +24,6 @@ public class GravitationalSystemMain {
         double delta_t = Double.parseDouble(System.getProperty(DT));
         double max_t = Double.parseDouble(System.getProperty(MAX_T));
         int simulation = Integer.parseInt(System.getProperty(SIMULATION));
-        String outputFile = System.getProperty(OUTPUT_FILE);
 
         switch (simulation) {
             case 1 -> optimalDeltaT(n, max_t);
@@ -38,7 +36,7 @@ public class GravitationalSystemMain {
 
     private static void rhmSimulation(double deltaT, double maxT) throws IOException {
         //Para cada valor de N, se realiza la simulacion 10 veces dejando las 10 iteraciones en el mismo archivo
-        int[] particleCounts = {100, 500, 1000, 1500, 2000};
+        int[] particleCounts = {1500};
         AtomicInteger j = new AtomicInteger(0);
         for (int particleCount : particleCounts) {
             try (PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")) {
@@ -159,43 +157,42 @@ public class GravitationalSystemMain {
         ParticleGenerator.generate(n, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
         GravitationalSystem system = new GravitationalSystem(particles, 1, 1, 0.1);
         EstimationMethod estimationMethod = new EstimationMethod(system, delta_t, max_t);
-
-//        System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Verlet method.");
-//        System.out.println("System energy before: " + system.systemEnergy());
+        System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Verlet method.");
+        System.out.println("System energy before: " + system.systemEnergy());
         Iterator<Time> timeIt;
-//        timeIt = estimationMethod.verletEstimation();
-//        GravitationalSystem systemIteratorCopy1 = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
+        timeIt = estimationMethod.verletEstimation();
+        GravitationalSystem systemIteratorCopy1 = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
         AtomicInteger i = new AtomicInteger(0);
-//        try (PostProcessor postProcessor = new PostProcessor("verletGravitational.txt");
-//             PostProcessor postProcessorEnergy = new PostProcessor("energyVerletGravitational.txt");
-//             PostProcessor animProcessor = new PostProcessor("animVerletGravitational.txt")) {
-//            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy1.systemEnergy());
-//            timeIt.forEachRemaining(time -> {
-//                if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
-//                    postProcessor.processTime(time);
-//                    animProcessor.processTimeAnim(time);
-//                    postProcessorEnergy.processSystemEnergy(time, systemIteratorCopy1.systemEnergy());
-//                }
-//            });
-//        }
-//
-//        System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Beeman method.");
-//        System.out.println("System energy before: " + system.systemEnergy());
-//        timeIt = estimationMethod.beemanEstimation();
-//        GravitationalSystem systemIteratorCopy2 = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
-//        i.set(0);
-//        try (PostProcessor postProcessor = new PostProcessor("beemanGravitational.txt");
-//             PostProcessor postProcessorEnergy = new PostProcessor("energyBeemanGravitational.txt");
-//             PostProcessor animProcessor2 = new PostProcessor("animBeemanGravitational.txt")) {
-//            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy2.systemEnergy());
-//            timeIt.forEachRemaining(time -> {
-//                if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
-//                    postProcessor.processTime(time);
-//                    postProcessorEnergy.processSystemEnergy(time, systemIteratorCopy2.systemEnergy());
-//                    animProcessor2.processTimeAnim(time);
-//                }
-//            });
-//        }
+        try (PostProcessor postProcessor = new PostProcessor("verletGravitational.txt");
+             PostProcessor postProcessorEnergy = new PostProcessor("energyVerletGravitational.txt");
+             PostProcessor animProcessor = new PostProcessor("animVerletGravitational.txt")) {
+            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy1.systemEnergy());
+            timeIt.forEachRemaining(time -> {
+                if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
+                    postProcessor.processTime(time);
+                    animProcessor.processTimeAnim(time);
+                    postProcessorEnergy.processSystemEnergy(time, systemIteratorCopy1.systemEnergy());
+                }
+            });
+        }
+
+        System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Beeman method.");
+        System.out.println("System energy before: " + system.systemEnergy());
+        timeIt = estimationMethod.beemanEstimation();
+        GravitationalSystem systemIteratorCopy2 = (GravitationalSystem) estimationMethod.getCurrentModelCopy();
+        i.set(0);
+        try (PostProcessor postProcessor = new PostProcessor("beemanGravitational.txt");
+             PostProcessor postProcessorEnergy = new PostProcessor("energyBeemanGravitational.txt");
+             PostProcessor animProcessor2 = new PostProcessor("animBeemanGravitational.txt")) {
+            postProcessorEnergy.processSystemEnergy(new Time(0, particles), systemIteratorCopy2.systemEnergy());
+            timeIt.forEachRemaining(time -> {
+                if (i.getAndIncrement() % (1 / (SMOOTHING_FACTOR * delta_t)) == 0) {
+                    postProcessor.processTime(time);
+                    postProcessorEnergy.processSystemEnergy(time, systemIteratorCopy2.systemEnergy());
+                    animProcessor2.processTimeAnim(time);
+                }
+            });
+        }
 
         System.out.println("Starting simulation with " + n + " particles, delta_t = " + delta_t + ", max_t = " + max_t + "and Gear method.");
         System.out.println("System energy before: " + system.systemEnergy());

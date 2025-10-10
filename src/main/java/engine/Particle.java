@@ -88,10 +88,6 @@ public class Particle {
         return z;
     }
 
-    public double getDistanceAbs(){
-        return Math.sqrt(x*x + y*y + z*z);
-    }
-
     @Override
     public String toString() {
         return "%d: x=%.2f y=%.2f z=%.2f spx=%.2f spy=%.2f spx=%.2f".formatted(getId(), x, y, z, sx, sy, sz);
