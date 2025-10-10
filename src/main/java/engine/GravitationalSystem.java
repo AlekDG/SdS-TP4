@@ -122,9 +122,7 @@ public class GravitationalSystem implements MovementModel {
     @Override
     public double[][] getForceMatrix(){
         double[][] forceMatrix = new double[particles.size()][3];
-        for(Particle p : particles){
-            forceMatrix[p.getId()] = forceArray(p);
-        }
+        particles.parallelStream().forEach(p -> forceMatrix[p.getId()] = forceArray(p));
         return forceMatrix;
     }
 
