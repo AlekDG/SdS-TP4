@@ -98,7 +98,7 @@ public class Particle {
     }
 
     public String csvString() {
-        return "%.2f,%.30f,%.2f,%.2f,%.2f,%.2f".formatted(x, y, z, sx, sy, sz);
+        return "%.8f,%.8f,%.8f,%.8f,%.8f,%.8f".formatted(x, y, z, sx, sy, sz);
     }
     public String extXyzLine() {
         // species then pos (x y z) then vel (sx sy sz)
