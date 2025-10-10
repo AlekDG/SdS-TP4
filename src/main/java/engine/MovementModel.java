@@ -25,9 +25,6 @@ public interface MovementModel {
         return R2;
     }
 
-    double[][] computeR2FromState(double[][] positions, double[][] velocities);
-
-
     double[][] getR3Matrix();
 
     double[][] getR4Matrix();

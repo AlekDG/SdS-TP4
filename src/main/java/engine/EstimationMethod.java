@@ -214,6 +214,7 @@ public class EstimationMethod {
         public Time next() {
             for (Particle p : currentModelCopy.particles()) {
                 int id = p.getId();
+                Particle.PosSpeedPair[] newPosAndSpeed = new Particle.PosSpeedPair[DIM];
                 for (int d = 0; d < DIM; d++) {
                     double pos = prevGears[id][d][0];
                     double speed = prevGears[id][d][1];
@@ -228,10 +229,12 @@ public class EstimationMethod {
                     r3Pred[id][d] = taylorValueForList(new double[] {r3, r4, r5});
                     r4Pred[id][d] = taylorValueForList(new double[] {r4, r5});
                     r5Pred[id][d] = taylorValueForList(new double[] {r5});
+                    newPosAndSpeed[d] = new Particle.PosSpeedPair(posPred[id][d], velPred[id][d]);
                 }
+                p.setPositionAndSpeedPair(newPosAndSpeed);
             }
 
-            double[][] r2Computed = currentModelCopy.computeR2FromState(posPred, velPred);
+            double[][] r2Computed = getCurrentModelCopy().getR2Matrix();
 
             for (Particle p : currentModelCopy.particles()) {
                 int id = p.getId();

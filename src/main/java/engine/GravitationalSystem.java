@@ -132,48 +132,6 @@ public class GravitationalSystem implements MovementModel {
     }
 
     @Override
-    public double[][] computeR2FromState(double[][] positions, double[][] velocities) {
-        double[][] R2 = new double[particleCount()][Particle.DIMENSION];
-        for (Particle p : particles) {
-            int id = p.getId();
-            double x = positions[id][0];
-            double y = positions[id][1];
-            double z = positions[id][2];
-            double vx = velocities[id][0];
-            double vy = velocities[id][1];
-            double vz = velocities[id][2];
-
-            Particle particle = new Particle(id, x, y, z, vx, vy, vz, 0);
-
-            double[] forces = new double[] {0, 0, 0};
-
-            for (Particle otherPar : particles) {
-                int otherId = otherPar.getId();
-                if (id == otherId)
-                    continue;
-                double otherX = positions[otherId][0];
-                double otherY = positions[otherId][1];
-                double otherZ = positions[otherId][2];
-                double otherVX = velocities[otherId][0];
-                double otherVY = velocities[otherId][1];
-                double otherVZ = velocities[otherId][2];
-
-                Particle otherParticle = new Particle(otherId, otherX, otherY, otherZ, otherVX, otherVY, otherVZ, 0);
-                double[] currentParForce = forceCalculation(particle, otherParticle);
-                forces[0] += currentParForce[0];
-                forces[1] += currentParForce[1];
-                forces[2] += currentParForce[2];
-            }
-
-            R2[id][0] = forces[0] / mass;
-            R2[id][1] = forces[1] / mass;
-            R2[id][2] = forces[2] / mass;
-        }
-        return R2;
-    }
-
-
-    @Override
     public double[][] getR3Matrix() {
         return getEmptyMatrix();
     }
