@@ -41,8 +41,9 @@ public class GravitationalSystemMain {
         int[] particleCounts = {100, 500, 1000, 1500, 2000};
         AtomicInteger j = new AtomicInteger(0);
         for (int particleCount : particleCounts) {
-            for (int i = 0; i < 10; i++) {
-                try (PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + "corrida" + i + ".txt")) {
+            try (PostProcessor postProcessor = new PostProcessor("rhm" + particleCount + ".txt")) {
+                for (int i = 0; i < 10; i++) {
+                    postProcessor.writeRhmInitialLine(i);
                     Particle.resetGlobalId();
                     List<Particle> particles = new ArrayList<>();
                     ParticleGenerator.generate(particleCount, RADIUS, particles::add, INITIAL_VELOCITY_MODULUS);
