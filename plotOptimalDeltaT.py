@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Parámetros
-delta_ts = [10.0, 5.0, 1.0, 0.1, 0.05, 0.01]
-integradores = ['Gear','Beeman', 'Verlet']
+delta_ts = [0.1, 0.01, 0.001, 0.0001]
+integradores = ['Verlet', 'Beeman', 'Gear']
 
 # Loop sobre integradores
 for integrador in integradores:
@@ -18,14 +18,14 @@ for integrador in integradores:
         t = data[:,0]
         error_rel = data[:,1]
 
-        # Graficar
-        plt.plot(t, error_rel, label=f"Δt = {dt}")
+        # Graficar con notación científica para Δt
+        plt.plot(t, error_rel, label=f"Δt = {dt:.0e}s")
 
-    plt.title(f"Error relativo vs Tiempo - {integrador}")
-    plt.xlabel("Tiempo")
-    plt.ylabel("Error relativo |E(t)-E0|/E0")
-    plt.yscale('log')  # Logarítmica para comparar mejor errores pequeños y grandes
-    plt.legend()
+    plt.xlabel("Tiempo (s)")
+    plt.ylabel("Error relativo")
+    plt.yscale('log')
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
